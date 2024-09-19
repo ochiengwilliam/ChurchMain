@@ -67,7 +67,12 @@ function rfid() {
                 />
               </CCol>
               <CCol md="6">
-                <CFormLabel htmlFor="middleName">Middle Name</CFormLabel>
+                <CFormLabel
+                  htmlFor="middleName"
+                  style={{ color: "blue", fontWeight: "bold" }}
+                >
+                  Middle Name
+                </CFormLabel>
                 <CFormInput
                   id="middleName"
                   name="middleName"
@@ -91,7 +96,7 @@ function rfid() {
                 />
               </CCol>
               <CCol md="6">
-                <CFormLabel htmlFor="nationalId">National ID</CFormLabel>
+                <CFormLabel htmlFor="nationalId">Serial Number</CFormLabel>
                 <CFormInput
                   id="nationalId"
                   name="nationalId"
@@ -105,7 +110,7 @@ function rfid() {
 
             <CRow className="mb-3">
               <CCol md="6">
-                <CFormLabel htmlFor="mobile">Mobile Number</CFormLabel>
+                <CFormLabel htmlFor="mobile">Member Type</CFormLabel>
                 <CFormInput
                   id="mobile"
                   name="mobile"

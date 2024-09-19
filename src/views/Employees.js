@@ -67,7 +67,12 @@ function EmployeeForm() {
                 />
               </CCol>
               <CCol md="6">
-                <CFormLabel htmlFor="middleName">Middle Name</CFormLabel>
+                <CFormLabel
+                  htmlFor="middleName"
+                  style={{ color: "blue", fontWeight: "bold" }}
+                >
+                  Middle Name
+                </CFormLabel>
                 <CFormInput
                   id="middleName"
                   name="middleName"
@@ -80,7 +85,12 @@ function EmployeeForm() {
 
             <CRow className="mb-3">
               <CCol md="6">
-                <CFormLabel htmlFor="lastName">Surname</CFormLabel>
+                <CFormLabel
+                  htmlFor="lastName"
+                  style={{ color: "blue", fontWeight: "bold" }}
+                >
+                  Surname
+                </CFormLabel>
                 <CFormInput
                   id="lastName"
                   name="lastName"
@@ -91,7 +101,12 @@ function EmployeeForm() {
                 />
               </CCol>
               <CCol md="6">
-                <CFormLabel htmlFor="nationalId">National ID</CFormLabel>
+                <CFormLabel
+                  htmlFor="nationalId"
+                  style={{ color: "blue", fontWeight: "bold" }}
+                >
+                  National ID
+                </CFormLabel>
                 <CFormInput
                   id="nationalId"
                   name="nationalId"
@@ -105,7 +120,12 @@ function EmployeeForm() {
 
             <CRow className="mb-3">
               <CCol md="6">
-                <CFormLabel htmlFor="mobile">Mobile Number</CFormLabel>
+                <CFormLabel
+                  htmlFor="mobile"
+                  style={{ color: "blue", fontWeight: "bold" }}
+                >
+                  Mobile Number
+                </CFormLabel>
                 <CFormInput
                   id="mobile"
                   name="mobile"
@@ -117,7 +137,11 @@ function EmployeeForm() {
               </CCol>
             </CRow>
 
-            <CButton type="submit" color="primary">
+            <CButton
+              type="submit"
+              color="primary"
+              style={{ fontWeight: "bold" }}
+            >
               Submit
             </CButton>
           </CForm>
