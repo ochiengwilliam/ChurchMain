@@ -38,19 +38,50 @@ const _nav = [
     component: CNavTitle,
     name: null,
   },
-
+  /*
   {
-    component: CNavItem,
+    component: CNavGroup,
     name: "Registration",
     to: "/registration",
     icon: <MdAccountCircle className="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: "Regular Members",
+        to: "/registration/regular members",
+      },
+      {
+        component: CNavItem,
+        name: "Visitors",
+        to: "/registration/visitors",
+      },
+    ],
+  },
+
+  */
+  {
+    component: CNavGroup,
+    name: "Registration",
+    icon: <MdAccountCircle className="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: "Regular Members",
+        to: "/RegularMembers",
+      },
+      {
+        component: CNavItem,
+        name: "Visitors",
+        to: "/visitors",
+      },
+    ],
   },
 
   {
     component: CNavItem,
-    name: "RFID Registration",
-    to: "/rfid",
-    icon: <MdAccountCircle className="nav-icon" />,
+    name: "Employees",
+    to: "/employees",
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
 
   {
@@ -62,9 +93,9 @@ const _nav = [
 
   {
     component: CNavItem,
-    name: "Employees",
-    to: "/employees",
-    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+    name: "RFID Registration",
+    to: "/rfid",
+    icon: <MdAccountCircle className="nav-icon" />,
   },
 
   {

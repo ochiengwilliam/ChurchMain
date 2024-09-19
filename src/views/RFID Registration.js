@@ -110,7 +110,7 @@ function rfid() {
 
             <CRow className="mb-3">
               <CCol md="6">
-                <CFormLabel htmlFor="mobile">Member Type</CFormLabel>
+                <CFormLabel htmlFor="mobile">Card Number</CFormLabel>
                 <CFormInput
                   id="mobile"
                   name="mobile"

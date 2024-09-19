@@ -226,6 +226,7 @@ const Members = () => {
               <CTableHeaderCell scope="col">#</CTableHeaderCell>
               <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
+              <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
               <CTableHeaderCell scope="col">Mobile Number</CTableHeaderCell>
               <CTableHeaderCell scope="col">Email</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
@@ -237,25 +238,29 @@ const Members = () => {
                 <CTableHeaderCell scope="row">{member.id}</CTableHeaderCell>
                 <CTableDataCell>{member.firstName}</CTableDataCell>
                 <CTableDataCell>{member.lastName || "-"}</CTableDataCell>
+                <CTableDataCell></CTableDataCell>{" "}
+                {/* National ID column left empty */}
                 <CTableDataCell>{member.mobile}</CTableDataCell>
                 <CTableDataCell>{member.email}</CTableDataCell>
                 <CTableDataCell>
-                  <CDropdown alignment="end">
-                    <CDropdownToggle
-                      color="success"
-                      style={{ color: "#fff", fontWeight: "bold" }}
-                    >
-                      Action
-                    </CDropdownToggle>
-                    <CDropdownMenu>
-                      <CDropdownItem
-                        onClick={() => handleAssignCardClick(member)}
+                  <div>
+                    <CDropdown alignment="end">
+                      <CDropdownToggle
+                        color="success"
+                        style={{ color: "#fff", fontWeight: "bold" }}
                       >
-                        Assign Card
-                      </CDropdownItem>
-                      <CDropdownItem>Delete</CDropdownItem>
-                    </CDropdownMenu>
-                  </CDropdown>
+                        Action
+                      </CDropdownToggle>
+                      <CDropdownMenu>
+                        <CDropdownItem
+                          onClick={() => handleAssignCardClick(member)}
+                        >
+                          Assign Card
+                        </CDropdownItem>
+                        <CDropdownItem>Delete</CDropdownItem>
+                      </CDropdownMenu>
+                    </CDropdown>
+                  </div>
                 </CTableDataCell>
               </CTableRow>
             ))}

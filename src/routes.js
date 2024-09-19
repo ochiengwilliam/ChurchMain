@@ -80,7 +80,15 @@ const Widgets = React.lazy(() => import("./views/widgets/Widgets"));
 
 //Resgistration
 
-const Registration = React.lazy(() => import("./views/Registration"));
+const Registration = React.lazy(
+  () => import("./views/Registration/Regular Members/Regular Members")
+);
+
+//Visitors
+
+const Visitors = React.lazy(
+  () => import("./views/Registration/Visitors/Visitors")
+);
 
 //Members
 const Members = React.lazy(() => import("./views/Members"));
@@ -99,12 +107,14 @@ const RFID = React.lazy(() => import("./views/RFID Registration"));
 const routes = [
   { path: "/", exact: true, name: "Home" },
   { path: "/dashboard", name: "Dashboard", element: Dashboard },
-  { path: "/registration", name: "Registration", element: Registration },
+  //{ path: "/registration", name: "Registration", element: Registration },
   { path: "/reports", name: "Reports", element: Reports },
   { path: "/employees", name: "Employees", element: Employees },
   { path: "/rfid", name: "RFID Registraion", element: RFID },
 
   { path: "/members", name: "Members", element: Members },
+  { path: "/RegularMembers", name: "Regular Members", element: Registration },
+  { path: "/Visitors", name: "Visitors", element: Visitors },
 
   { path: "/theme", name: "Theme", element: Colors, exact: true },
   { path: "/theme/colors", name: "Colors", element: Colors },
