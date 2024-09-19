@@ -1,5 +1,5 @@
-import React from 'react'
-import CIcon from '@coreui/icons-react'
+import React from "react";
+import CIcon from "@coreui/icons-react";
 import {
   cilBell,
   cilCalculator,
@@ -14,11 +14,11 @@ import {
   cilStar,
   cilUserPlus,
   cilGroup,
-} from '@coreui/icons'
+} from "@coreui/icons";
 
-import { MdAccountCircle, MdCoPresent, MdCorporateFare } from 'react-icons/md'
+import { MdAccountCircle, MdCoPresent, MdCorporateFare } from "react-icons/md";
 
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import { CNavGroup, CNavItem, CNavTitle } from "@coreui/react";
 
 const _nav = [
   /*
@@ -41,31 +41,38 @@ const _nav = [
 
   {
     component: CNavItem,
-    name: 'Registration',
-    to: '/registration',
+    name: "Registration",
+    to: "/registration",
     icon: <MdAccountCircle className="nav-icon" />,
   },
 
   {
     component: CNavItem,
-    name: 'Members',
-    to: '/members',
+    name: "RFID Registration",
+    to: "/rfid",
+    icon: <MdAccountCircle className="nav-icon" />,
+  },
+
+  {
+    component: CNavItem,
+    name: "Members",
+    to: "/members",
     icon: <MdCoPresent className="nav-icon" />,
   },
 
   {
     component: CNavItem,
-    name: 'Employees',
-    to: '/employees',
+    name: "Employees",
+    to: "/employees",
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
 
   {
     component: CNavItem,
-    name: 'Reports',
-    to: '/reports',
+    name: "Reports",
+    to: "/reports",
     icon: <MdCorporateFare className="nav-icon" />,
-    color: 'white',
+    color: "white",
   },
 
   /*
@@ -341,6 +348,6 @@ const _nav = [
   },
 
 */
-]
+];
 
-export default _nav
+export default _nav;

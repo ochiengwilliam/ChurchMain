@@ -11,7 +11,7 @@ import {
   CCol,
 } from "@coreui/react";
 
-function EmployeeForm() {
+function rfid() {
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -45,7 +45,7 @@ function EmployeeForm() {
         }}
       >
         <CCardHeader style={{ backgroundColor: "#fff" }}>
-          <h3>EMPLOYEE FORM</h3>
+          <h3>RFID REGISTRATION FORM</h3>
         </CCardHeader>
         <CCardBody>
           <CForm onSubmit={handleSubmit}>
@@ -127,4 +127,4 @@ function EmployeeForm() {
   );
 }
 
-export default EmployeeForm;
+export default rfid;
