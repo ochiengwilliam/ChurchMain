@@ -16,7 +16,13 @@ import {
   cilGroup,
 } from "@coreui/icons";
 
-import { MdAccountCircle, MdCoPresent, MdCorporateFare } from "react-icons/md";
+import {
+  MdAccountCircle,
+  MdCoPresent,
+  MdCorporateFare,
+  MdSpeakerPhone,
+  MdGroupAdd,
+} from "react-icons/md";
 
 import { CNavGroup, CNavItem, CNavTitle } from "@coreui/react";
 
@@ -62,11 +68,12 @@ const _nav = [
   {
     component: CNavGroup,
     name: "Registration",
-    icon: <MdAccountCircle className="nav-icon" />,
+    icon: <MdAccountCircle className="nav-icon" style={{ fontSize: "40px" }} />,
     items: [
       {
         component: CNavItem,
         name: "Regular Members",
+
         to: "/RegularMembers",
       },
       {
@@ -88,14 +95,14 @@ const _nav = [
     component: CNavItem,
     name: "Members",
     to: "/members",
-    icon: <MdCoPresent className="nav-icon" />,
+    icon: <MdGroupAdd className="nav-icon" />,
   },
 
   {
     component: CNavItem,
     name: "RFID Registration",
     to: "/rfid",
-    icon: <MdAccountCircle className="nav-icon" />,
+    icon: <MdSpeakerPhone className="nav-icon" />,
   },
 
   {

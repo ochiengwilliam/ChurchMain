@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   CTable,
   CTableBody,
@@ -7,18 +7,36 @@ import {
   CTableHeaderCell,
   CTableRow,
   CButton,
-} from '@coreui/react'
+} from "@coreui/react";
 
 const Reports = () => {
   const members = [
-    { id: 1, firstName: 'Mark', lastName: 'Otto', time: '09:00 AM', status: 'Present' },
-    { id: 2, firstName: 'Jacob', lastName: 'Thornton', time: '09:15 AM', status: 'Absent' },
-    { id: 3, firstName: 'Larry', lastName: 'Bird', time: '09:10 AM', status: 'Present' },
-  ]
+    {
+      id: 1,
+      firstName: "Mark",
+      lastName: "Otto",
+      time: "09:00 AM",
+      status: "Present",
+    },
+    {
+      id: 2,
+      firstName: "Jacob",
+      lastName: "Thornton",
+      time: "09:15 AM",
+      status: "Absent",
+    },
+    {
+      id: 3,
+      firstName: "Larry",
+      lastName: "Bird",
+      time: "09:10 AM",
+      status: "Present",
+    },
+  ];
 
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   return (
     <CTable>
@@ -52,7 +70,7 @@ const Reports = () => {
         </CTableRow>
       </CTableBody>
     </CTable>
-  )
-}
+  );
+};
 
-export default Reports
+export default Reports;

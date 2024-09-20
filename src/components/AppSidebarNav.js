@@ -1,25 +1,35 @@
-import React, { useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import PropTypes from 'prop-types'
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
+import PropTypes from "prop-types";
 
-import SimpleBar from 'simplebar-react'
-import 'simplebar-react/dist/simplebar.min.css'
-import '../scss/nav1.css'
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
+import "../scss/nav1.css";
 
-import { CBadge, CNavLink, CSidebarNav } from '@coreui/react'
-import styled from 'styled-components'
+import { CBadge, CNavLink, CSidebarNav } from "@coreui/react";
+import styled from "styled-components";
+
+// Define a styled-component for NavIcon to adjust SVG icon size
+const NavIcon = styled.span`
+  svg {
+    width: 50px;
+    height: 50px;
+  }
+`;
 
 export const AppSidebarNav = ({ items }) => {
   const navLink = (name, icon, badge, indent = false) => {
     return (
       <>
-        {icon
-          ? icon
-          : indent && (
-              <span className="nav-icon">
-                <span className="nav-icon-bullet"></span>
-              </span>
-            )}
+        {icon ? (
+          <NavIcon>{icon}</NavIcon> // Wrap the icon with NavIcon styled component
+        ) : (
+          indent && (
+            <span className="nav-icon">
+              <span className="nav-icon-bullet"></span>
+            </span>
+          )
+        )}
         {name && name}
         {badge && (
           <CBadge color={badge.color} className="ms-auto">
@@ -27,12 +37,12 @@ export const AppSidebarNav = ({ items }) => {
           </CBadge>
         )}
       </>
-    )
-  }
+    );
+  };
 
   const navItem = (item, index, indent = false) => {
-    const { component, name, badge, icon, ...rest } = item
-    const Component = component
+    const { component, name, badge, icon, ...rest } = item;
+    const Component = component;
     return (
       <Component as="div" key={index} color="success">
         {rest.to || rest.href ? (
@@ -43,29 +53,37 @@ export const AppSidebarNav = ({ items }) => {
           navLink(name, icon, badge, indent)
         )}
       </Component>
-    )
-  }
+    );
+  };
 
   const navGroup = (item, index) => {
-    const { component, name, icon, items, to, ...rest } = item
-    const Component = component
+    const { component, name, icon, items, to, ...rest } = item;
+    const Component = component;
     return (
-      <Component compact as="div" key={index} toggler={navLink(name, icon)} {...rest}>
+      <Component
+        compact
+        as="div"
+        key={index}
+        toggler={navLink(name, icon)}
+        {...rest}
+      >
         {item.items?.map((item, index) =>
-          item.items ? navGroup(item, index) : navItem(item, index, true),
+          item.items ? navGroup(item, index) : navItem(item, index, true)
         )}
       </Component>
-    )
-  }
+    );
+  };
 
   return (
     <CSidebarNav as={SimpleBar}>
       {items &&
-        items.map((item, index) => (item.items ? navGroup(item, index) : navItem(item, index)))}
+        items.map((item, index) =>
+          item.items ? navGroup(item, index) : navItem(item, index)
+        )}
     </CSidebarNav>
-  )
-}
+  );
+};
 
 AppSidebarNav.propTypes = {
   items: PropTypes.arrayOf(PropTypes.any).isRequired,
-}
+};

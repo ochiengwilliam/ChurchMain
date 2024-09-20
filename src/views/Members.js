@@ -165,7 +165,7 @@ const Members = () => {
                 cursor: "pointer",
               }}
             >
-              Receiving Members
+              Holy Communion
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -220,7 +220,7 @@ const Members = () => {
         </CInputGroup>
 
         {/* Table to display filtered members */}
-        <CTable>
+        <CTable striped>
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell scope="col">#</CTableHeaderCell>
