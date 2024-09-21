@@ -15,6 +15,8 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from "@coreui/react";
+import { cilTrash } from "@coreui/icons"; // Importing the trash icon
+import CIcon from "@coreui/icons-react"; // Importing CIcon to use the icon component
 import { useState } from "react";
 
 const Visitors = () => {
@@ -52,12 +54,12 @@ const Visitors = () => {
   };
 
   const handleLinkCard = (index) => {
-    alert(`Linking card to visitor at position ${index + 1}...`);
+    // alert(`Linking card to visitor at position ${index + 1}...`);
     // Add your card linking logic here
   };
 
   const handleDelinkCard = (index) => {
-    alert(`Delinking card from visitor at position ${index + 1}...`);
+    // alert(`Delinking card from visitor at position ${index + 1}...`);
     // Add your card delinking logic here
   };
 
@@ -214,7 +216,8 @@ const Visitors = () => {
                             color="danger"
                             onClick={() => handleDelinkCard(index)}
                           >
-                            Delink Card
+                            <CIcon icon={cilTrash} />{" "}
+                            {/* Using the trash icon here */}
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>

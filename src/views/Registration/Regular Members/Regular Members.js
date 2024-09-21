@@ -11,6 +11,8 @@ import {
 } from "@coreui/react";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { cilTrash } from "@coreui/icons"; // Importing the trash icon
+import CIcon from "@coreui/icons-react"; // Importing CIcon to use the icon component
 
 const Registration = () => {
   const [files, setFiles] = useState(null);
@@ -21,6 +23,7 @@ const Registration = () => {
   const handleDragOver = (e) => {
     e.preventDefault();
   };
+
   const handleDrop = (e) => {
     e.preventDefault();
     setFiles(e.dataTransfer.files);
@@ -28,7 +31,7 @@ const Registration = () => {
 
   const handleDelete = (fileObj) => {
     const newFiles = Object.values(files).filter((file) => file !== fileObj);
-    setFiles(newFiles);
+    setFiles(newFiles.length > 0 ? newFiles : null); // Set to null if no files are left
   };
 
   const handleUpload = () => {
@@ -120,25 +123,27 @@ const Registration = () => {
                         </span>
                       </div>
 
-                      {/* Delete button positioned next to the bar */}
+                      {/* Delete button with trash icon */}
                       <CButton
                         color="danger"
                         style={{ color: "#fff" }}
                         onClick={() => handleDelete(file)}
                       >
-                        Delete
+                        <CIcon icon={cilTrash} /> {/* Trash icon used here */}
                       </CButton>
                     </div>
                   ))}
 
-                  {/* Upload button */}
-                  <CButton
-                    color="success"
-                    onClick={handleUpload}
-                    style={{ marginTop: "20px", color: "#fff" }}
-                  >
-                    Upload
-                  </CButton>
+                  {/* Conditional rendering for the Upload button */}
+                  {files && Array.from(files).length > 0 && (
+                    <CButton
+                      color="success"
+                      onClick={handleUpload}
+                      style={{ marginTop: "20px", color: "#fff" }}
+                    >
+                      Upload
+                    </CButton>
+                  )}
                 </div>
               )}
             </CCardBody>
@@ -172,7 +177,7 @@ const Registration = () => {
           <CButton
             color="primary"
             className="mt-3"
-            style={{ width: "80%" }}
+            style={{ width: "50%", borderRadius: "50px", fontWeight: "bold" }}
             onClick={handleRedirect} // Call the handleRedirect function
           >
             OK

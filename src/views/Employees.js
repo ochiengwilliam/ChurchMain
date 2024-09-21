@@ -9,9 +9,18 @@ import {
   CButton,
   CRow,
   CCol,
+  CTable,
+  CTableHead,
+  CTableHeaderCell,
+  CTableRow,
+  CTableDataCell,
+  CTableBody,
 } from "@coreui/react";
+import { cilTrash } from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
 
 function EmployeeForm() {
+  // State to store individual form data
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -20,18 +29,42 @@ function EmployeeForm() {
     mobile: "",
   });
 
+  // State to store the list of employees
+  const [employeeDataList, setEmployeeDataList] = useState([]);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Add the current form data to the employee list
+    setEmployeeDataList((prevList) => [...prevList, formData]);
+
+    // Clear the form fields
     setFormData({
-      ...formData,
-      [name]: value,
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      nationalId: "",
+      mobile: "",
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Employee Data Submitted:", formData);
-    // Add form submission logic here
+  // Handle assigning a card to an employee
+  const handleAssignCard = (index) => {
+    // alert(`Assigning card to employee at position ${index + 1}...`);
+    // Add your card assigning logic here
+  };
+
+  // Handle removing a card from an employee
+  const handleRemoveCard = (index) => {
+    //alert(`Removing card from employee at position ${index + 1}...`);
+    // Add your card removing logic here
   };
 
   return (
@@ -147,6 +180,57 @@ function EmployeeForm() {
           </CForm>
         </CCardBody>
       </CCard>
+
+      {/* Employee Details Table */}
+      {employeeDataList.length > 0 && (
+        <CCard className="mb-4">
+          <CCardHeader>
+            <h3>Employee Details</h3>
+          </CCardHeader>
+          <CCardBody>
+            <CTable striped responsive>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell>#</CTableHeaderCell>
+                  <CTableHeaderCell>First Name</CTableHeaderCell>
+                  <CTableHeaderCell>Middle Name</CTableHeaderCell>
+                  <CTableHeaderCell>Surname</CTableHeaderCell>
+                  <CTableHeaderCell>National ID</CTableHeaderCell>
+                  <CTableHeaderCell>Mobile Number</CTableHeaderCell>
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {employeeDataList.map((employee, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell>{index + 1}</CTableDataCell>
+                    <CTableDataCell>{employee.firstName}</CTableDataCell>
+                    <CTableDataCell>{employee.middleName}</CTableDataCell>
+                    <CTableDataCell>{employee.lastName}</CTableDataCell>
+                    <CTableDataCell>{employee.nationalId}</CTableDataCell>
+                    <CTableDataCell>{employee.mobile}</CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        color="success"
+                        className="me-2"
+                        onClick={() => handleAssignCard(index)}
+                      >
+                        Assign Card
+                      </CButton>
+                      <CButton
+                        color="danger"
+                        onClick={() => handleRemoveCard(index)}
+                      >
+                        <CIcon icon={cilTrash} />
+                      </CButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </CCardBody>
+        </CCard>
+      )}
     </>
   );
 }
