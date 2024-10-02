@@ -90,6 +90,12 @@ const Visitors = React.lazy(
   () => import("./views/Registration/Visitors/Visitors")
 );
 
+//Form
+
+const RegistrationForm = React.lazy(
+  () => import("./views/Registration/Registration Form/Registration Form")
+);
+
 //Members
 const Members = React.lazy(() => import("./views/Members"));
 
@@ -115,6 +121,11 @@ const routes = [
   { path: "/members", name: "Members", element: Members },
   { path: "/RegularMembers", name: "Regular Members", element: Registration },
   { path: "/Visitors", name: "Visitors", element: Visitors },
+  {
+    path: "/RegistrationForm",
+    name: "Registration Form",
+    element: RegistrationForm,
+  },
 
   { path: "/theme", name: "Theme", element: Colors, exact: true },
   { path: "/theme/colors", name: "Colors", element: Colors },

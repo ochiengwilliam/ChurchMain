@@ -33,7 +33,7 @@ const Reports = () => {
     {
       id: 2,
       firstName: "Jacob",
-      lastName: "Thornton",
+      lastName: "Jack",
       mobile: "345678907890",
       email: "fat@gmail.com",
       receiving: true,
