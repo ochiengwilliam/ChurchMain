@@ -25,6 +25,12 @@ const Form = () => {
     firstName: "",
     middleName: "",
     surname: "",
+    dob: "",
+    district: "",
+    zpNo: "",
+    maritalStatus: "",
+    spouseName: "",
+    spouseZpNo: "",
     nationalId: "",
     mobile: "",
   });
@@ -48,19 +54,15 @@ const Form = () => {
       firstName: "",
       middleName: "",
       surname: "",
+      dob: "",
+      district: "",
+      zpNo: "",
+      maritalStatus: "",
+      spouseName: "",
+      spouseZpNo: "",
       nationalId: "",
       mobile: "",
     });
-  };
-
-  const handleLinkCard = (index) => {
-    // alert(`Linking card to visitor at position ${index + 1}...`);
-    // Add your card linking logic here
-  };
-
-  const handleDelinkCard = (index) => {
-    // alert(`Delinking card from visitor at position ${index + 1}...`);
-    // Add your card delinking logic here
   };
 
   return (
@@ -77,7 +79,7 @@ const Form = () => {
             }}
           >
             <CCardHeader style={{ backgroundColor: "#fff" }}>
-              <h3>Visitor Registration</h3>
+              <h3>Registration Form</h3>
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
@@ -134,6 +136,108 @@ const Form = () => {
                   </CCol>
                   <CCol md="6">
                     <CFormLabel
+                      htmlFor="dob"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Date of Birth
+                    </CFormLabel>
+                    <CFormInput
+                      id="dob"
+                      name="dob"
+                      value={formData.dob}
+                      onChange={handleChange}
+                      placeholder="Enter date of birth"
+                      required
+                    />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="district"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      District
+                    </CFormLabel>
+                    <CFormInput
+                      id="district"
+                      name="district"
+                      value={formData.district}
+                      onChange={handleChange}
+                      placeholder="Enter district"
+                      required
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="zpNo"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      ZP Number
+                    </CFormLabel>
+                    <CFormInput
+                      id="zpNo"
+                      name="zpNo"
+                      value={formData.zpNo}
+                      onChange={handleChange}
+                      placeholder="Enter ZP number"
+                      required
+                    />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="maritalStatus"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Marital Status
+                    </CFormLabel>
+                    <CFormInput
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      value={formData.maritalStatus}
+                      onChange={handleChange}
+                      placeholder="Enter marital status"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="spouseName"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Spouse Name
+                    </CFormLabel>
+                    <CFormInput
+                      id="spouseName"
+                      name="spouseName"
+                      value={formData.spouseName}
+                      onChange={handleChange}
+                      placeholder="Enter spouse name"
+                    />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="spouseZpNo"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Spouse ZP No.
+                    </CFormLabel>
+                    <CFormInput
+                      id="spouseZpNo"
+                      name="spouseZpNo"
+                      value={formData.spouseZpNo}
+                      onChange={handleChange}
+                      placeholder="Enter spouse ZP number"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CFormLabel
                       htmlFor="nationalId"
                       style={{ color: "blue", fontWeight: "bold" }}
                     >
@@ -170,7 +274,7 @@ const Form = () => {
                 </CRow>
 
                 <CButton type="submit" color="primary">
-                  Register Visitor
+                  Register
                 </CButton>
               </CForm>
             </CCardBody>
@@ -180,7 +284,7 @@ const Form = () => {
           {visitorDataList.length > 0 && (
             <CCard className="mb-4">
               <CCardHeader>
-                <h3>Visitor Details</h3>
+                <h3>Registration Details</h3>
               </CCardHeader>
               <CCardBody>
                 <CTable>
@@ -190,6 +294,12 @@ const Form = () => {
                       <CTableHeaderCell>First Name</CTableHeaderCell>
                       <CTableHeaderCell>Middle Name</CTableHeaderCell>
                       <CTableHeaderCell>Surname</CTableHeaderCell>
+                      <CTableHeaderCell>DOB</CTableHeaderCell>
+                      <CTableHeaderCell>District</CTableHeaderCell>
+                      <CTableHeaderCell>ZP No.</CTableHeaderCell>
+                      <CTableHeaderCell>Marital Status</CTableHeaderCell>
+                      <CTableHeaderCell>Spouse Name</CTableHeaderCell>
+                      <CTableHeaderCell>Spouse ZP No.</CTableHeaderCell>
                       <CTableHeaderCell>National ID</CTableHeaderCell>
                       <CTableHeaderCell>Mobile Number</CTableHeaderCell>
                       <CTableHeaderCell>Actions</CTableHeaderCell>
@@ -202,6 +312,12 @@ const Form = () => {
                         <CTableDataCell>{visitor.firstName}</CTableDataCell>
                         <CTableDataCell>{visitor.middleName}</CTableDataCell>
                         <CTableDataCell>{visitor.surname}</CTableDataCell>
+                        <CTableDataCell>{visitor.dob}</CTableDataCell>
+                        <CTableDataCell>{visitor.district}</CTableDataCell>
+                        <CTableDataCell>{visitor.zpNo}</CTableDataCell>
+                        <CTableDataCell>{visitor.maritalStatus}</CTableDataCell>
+                        <CTableDataCell>{visitor.spouseName}</CTableDataCell>
+                        <CTableDataCell>{visitor.spouseZpNo}</CTableDataCell>
                         <CTableDataCell>{visitor.nationalId}</CTableDataCell>
                         <CTableDataCell>{visitor.mobile}</CTableDataCell>
                         <CTableDataCell>
@@ -217,7 +333,6 @@ const Form = () => {
                             onClick={() => handleDelinkCard(index)}
                           >
                             <CIcon icon={cilTrash} />{" "}
-                            {/* Using the trash icon here */}
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>
