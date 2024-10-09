@@ -107,6 +107,14 @@ const Reports = React.lazy(() => import("./views/Reports"));
 
 const Employees = React.lazy(() => import("./views/Employees"));
 
+//Elders
+
+const Elders = React.lazy(() => import("./views/Elders"));
+
+//Districts
+
+const Districts = React.lazy(() => import("./views/Districts"));
+
 //RFID
 const RFID = React.lazy(() => import("./views/RFID Registration"));
 
@@ -116,6 +124,8 @@ const routes = [
   //{ path: "/registration", name: "Registration", element: Registration },
   { path: "/reports", name: "Reports", element: Reports },
   { path: "/employees", name: "Employees", element: Employees },
+  { path: "/elders", name: "Elders", element: Elders },
+  { path: "/districts", name: "Districts", element: Districts },
   { path: "/rfid", name: "RFID Registraion", element: RFID },
 
   { path: "/members", name: "Members", element: Members },

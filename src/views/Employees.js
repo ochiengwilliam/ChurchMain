@@ -20,7 +20,6 @@ import { cilTrash } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
 
 function EmployeeForm() {
-  // State to store individual form data
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -29,42 +28,55 @@ function EmployeeForm() {
     mobile: "",
   });
 
-  // State to store the list of employees
   const [employeeDataList, setEmployeeDataList] = useState([]);
 
-  // Handle input changes
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Add the current form data to the employee list
-    setEmployeeDataList((prevList) => [...prevList, formData]);
+    try {
+      // Send POST request to backend
+      const response = await fetch("http://localhost:8080/api/employees/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData), // Send form data as JSON
+      });
 
-    // Clear the form fields
-    setFormData({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      nationalId: "",
-      mobile: "",
-    });
+      if (response.ok) {
+        // If successful, add the form data to the local list and clear form fields
+        const newEmployee = await response.json();
+        setEmployeeDataList((prevList) => [...prevList, newEmployee]);
+
+        // Clear form fields after submission
+        setFormData({
+          firstName: "",
+          middleName: "",
+          lastName: "",
+          nationalId: "",
+          mobile: "",
+        });
+      } else {
+        console.error("Failed to add employee.");
+      }
+    } catch (error) {
+      console.error("Error posting employee data:", error);
+    }
   };
 
-  // Handle assigning a card to an employee
   const handleAssignCard = (index) => {
-    // alert(`Assigning card to employee at position ${index + 1}...`);
-    // Add your card assigning logic here
+    // Logic for handling card assignment
   };
 
-  // Handle removing a card from an employee
   const handleRemoveCard = (index) => {
-    //alert(`Removing card from employee at position ${index + 1}...`);
-    // Add your card removing logic here
+    // Logic for handling card removal
   };
 
   return (

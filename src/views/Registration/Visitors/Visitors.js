@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   CButton,
   CCard,
@@ -7,6 +8,10 @@ import {
   CForm,
   CFormInput,
   CFormLabel,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
   CRow,
   CTable,
   CTableBody,
@@ -15,19 +20,23 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from "@coreui/react";
-import { cilTrash } from "@coreui/icons"; // Importing the trash icon
-import CIcon from "@coreui/icons-react"; // Importing CIcon to use the icon component
-import { useState } from "react";
+import { cilTrash } from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
 
 const Visitors = () => {
-  const [visitorDataList, setVisitorDataList] = useState([]); // State to store the list of visitors
+  const [visitorDataList, setVisitorDataList] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     surname: "",
     nationalId: "",
     mobile: "",
+    address: "",
+    gender: "",
   });
+  const [showModal, setShowModal] = useState(false); // State for showing the modal
+  const [modalMessage, setModalMessage] = useState(""); // State for storing the modal message
+  const [isError, setIsError] = useState(false); // State to handle success/error style
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,34 +49,54 @@ const Visitors = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Add the current formData to the list of visitors
-    setVisitorDataList((prevList) => [...prevList, formData]);
+    fetch("http://localhost:8080/api/visitors", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to register the visitor. Please try again.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setVisitorDataList((prevList) => [...prevList, data]);
 
-    // Clear the form fields
-    setFormData({
-      firstName: "",
-      middleName: "",
-      surname: "",
-      nationalId: "",
-      mobile: "",
-    });
-  };
+        // Reset form fields
+        setFormData({
+          firstName: "",
+          middleName: "",
+          surname: "",
+          nationalId: "",
+          mobile: "",
+          address: "",
+          gender: "",
+        });
 
-  const handleLinkCard = (index) => {
-    // alert(`Linking card to visitor at position ${index + 1}...`);
-    // Add your card linking logic here
-  };
+        // Show the success message in modal
+        setModalMessage("Visitor registration was successful!");
+        setIsError(false); // Set modal style to success
+        setShowModal(true);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
 
-  const handleDelinkCard = (index) => {
-    // alert(`Delinking card from visitor at position ${index + 1}...`);
-    // Add your card delinking logic here
+        // Show the error message in modal
+        setModalMessage(
+          "There was an error registering the visitor. Please try again."
+        );
+        setIsError(true); // Set modal style to error
+        setShowModal(true);
+      });
   };
 
   return (
     <>
       <CRow className="justify-content-md-center">
         <CCol xs={10}>
-          {/* Visitor Registration Card */}
           <CCard
             className="mb-4"
             style={{
@@ -81,6 +110,7 @@ const Visitors = () => {
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
+                {/* Form Inputs */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -167,6 +197,39 @@ const Visitors = () => {
                       required
                     />
                   </CCol>
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="address"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Address
+                    </CFormLabel>
+                    <CFormInput
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      placeholder="Enter address"
+                    />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="gender"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Gender
+                    </CFormLabel>
+                    <CFormInput
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      placeholder="Enter gender"
+                    />
+                  </CCol>
                 </CRow>
 
                 <CButton type="submit" color="primary">
@@ -175,6 +238,46 @@ const Visitors = () => {
               </CForm>
             </CCardBody>
           </CCard>
+
+          {/* Success/Error Modal */}
+          <CModal visible={showModal} onClose={() => setShowModal(false)}>
+            <CModalHeader onClose={() => setShowModal(false)}>
+              {isError ? "Registration Error" : "Registration Successful"}
+            </CModalHeader>
+            <CModalBody
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              {/* Conditionally use the error or success image */}
+              <img
+                src={
+                  isError
+                    ? "src/assets/images/avatars/12.jpg"
+                    : "src/assets/images/avatars/10.jpg"
+                }
+                alt={isError ? "Error Icon" : "Success Icon"}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  marginBottom: "10px",
+                }}
+              />
+              <p style={{ margin: "0" }}>{modalMessage}</p>
+            </CModalBody>
+            <CModalFooter style={{ display: "flex", justifyContent: "center" }}>
+              <CButton
+                color={isError ? "danger" : "success"}
+                onClick={() => setShowModal(false)}
+              >
+                Close
+              </CButton>
+            </CModalFooter>
+          </CModal>
 
           {/* Visitor Details Table */}
           {visitorDataList.length > 0 && (
@@ -192,6 +295,8 @@ const Visitors = () => {
                       <CTableHeaderCell>Surname</CTableHeaderCell>
                       <CTableHeaderCell>National ID</CTableHeaderCell>
                       <CTableHeaderCell>Mobile Number</CTableHeaderCell>
+                      <CTableHeaderCell>Address</CTableHeaderCell>
+                      <CTableHeaderCell>Gender</CTableHeaderCell>
                       <CTableHeaderCell>Actions</CTableHeaderCell>
                     </CTableRow>
                   </CTableHead>
@@ -204,6 +309,8 @@ const Visitors = () => {
                         <CTableDataCell>{visitor.surname}</CTableDataCell>
                         <CTableDataCell>{visitor.nationalId}</CTableDataCell>
                         <CTableDataCell>{visitor.mobile}</CTableDataCell>
+                        <CTableDataCell>{visitor.address}</CTableDataCell>
+                        <CTableDataCell>{visitor.gender}</CTableDataCell>
                         <CTableDataCell>
                           <CButton
                             color="success"
@@ -216,8 +323,7 @@ const Visitors = () => {
                             color="danger"
                             onClick={() => handleDelinkCard(index)}
                           >
-                            <CIcon icon={cilTrash} />{" "}
-                            {/* Using the trash icon here */}
+                            <CIcon icon={cilTrash} />
                           </CButton>
                         </CTableDataCell>
                       </CTableRow>

@@ -100,6 +100,20 @@ const _nav = [
 
   {
     component: CNavItem,
+    name: "Elders",
+    to: "/elders",
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+
+  {
+    component: CNavItem,
+    name: "Districts",
+    to: "/districts",
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+
+  {
+    component: CNavItem,
     name: "Members",
     to: "/members",
     icon: <MdGroupAdd className="nav-icon" />,

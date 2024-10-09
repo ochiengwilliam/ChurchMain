@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CCard,
   CTable,
@@ -18,98 +18,19 @@ import {
 import { FiSearch } from "react-icons/fi";
 
 const Reports = () => {
-  // Static members data
-  const members = [
-    {
-      id: 1,
-      firstName: "Mark",
-      lastName: "Otto",
-      mobile: "2334567890",
-      email: "otto@gmail.com",
-      receiving: true,
-      cardNumber: "123456",
-      cardSerialNumber: "SN123456",
-    },
-    {
-      id: 2,
-      firstName: "Jacob",
-      lastName: "Jack",
-      mobile: "345678907890",
-      email: "fat@gmail.com",
-      receiving: true,
-      cardNumber: "654321",
-      cardSerialNumber: "SN654321",
-    },
-    {
-      id: 3,
-      firstName: "Larry",
-      lastName: "Bird",
-      mobile: "4567890",
-      email: "bird@gmail.com",
-      receiving: true,
-      cardNumber: "112233",
-      cardSerialNumber: "SN112233",
-    },
-    {
-      id: 4,
-      firstName: "Robbie",
-      lastName: "Right",
-      mobile: "01150010978",
-      email: "robbie@gmail.com",
-      receiving: false,
-      cardNumber: "",
-      cardSerialNumber: "",
-    },
-    {
-      id: 5,
-      firstName: "Ashley",
-      lastName: "Williams",
-      mobile: "737872387918",
-      email: "ashley@gmail.com",
-      receiving: false,
-      cardNumber: "",
-      cardSerialNumber: "",
-    },
-    {
-      id: 6,
-      firstName: "Ramsey",
-      lastName: "Bolton",
-      mobile: "34567890897654",
-      email: "ramsey@gmail.com",
-      receiving: true,
-      cardNumber: "445566",
-      cardSerialNumber: "SN445566",
-    },
-    {
-      id: 7,
-      firstName: "Leannah",
-      lastName: "Smith",
-      mobile: "7881479894891",
-      email: "leannah@gmail.com",
-      receiving: false,
-      cardNumber: "",
-      cardSerialNumber: "",
-    },
-    {
-      id: 8,
-      firstName: "Rosie",
-      lastName: "Fox",
-      mobile: "7634676893",
-      email: "fox@gmail.com",
-      receiving: true,
-      cardNumber: "778899",
-      cardSerialNumber: "SN778899",
-    },
-  ];
-
-  // State to manage active report tab
+  const [members, setMembers] = useState([]); // State for members data from API
   const [activeTab, setActiveTab] = useState(1); // 1: All, 2: Holy Communion, 3: Non-Receiving, 4: Active Members, 5: Dormant Members
-
-  // States for search filters
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
 
-  // Function to handle print
+  // Fetch members data from API on component mount
+  useEffect(() => {
+    fetch("http://localhost:8080/api/members")
+      .then((response) => response.json())
+      .then((data) => setMembers(data))
+      .catch((error) => console.error("Error fetching members:", error));
+  }, []);
+
   const handlePrint = () => {
     window.print();
   };
@@ -132,9 +53,9 @@ const Reports = () => {
       } else if (activeTab === 3) {
         matchesTab = !member.receiving; // Non-Receiving
       } else if (activeTab === 4) {
-        matchesTab = member.id !== 5 && member.id !== 7; // Active Members
+        matchesTab = member.active; // Active Members
       } else if (activeTab === 5) {
-        matchesTab = member.id === 5 || member.id === 7; // Dormant Members
+        matchesTab = !member.active; // Dormant Members
       }
 
       return matchesFirstName && matchesMobile && matchesTab;
