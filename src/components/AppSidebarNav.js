@@ -9,11 +9,17 @@ import "../scss/nav1.css";
 import { CBadge, CNavLink, CSidebarNav } from "@coreui/react";
 import styled from "styled-components";
 
-// Define a styled-component for NavIcon to adjust SVG icon size
+// Define a styled-component for NavIcon to adjust SVG icon size and hover effect
 const NavIcon = styled.span`
   svg {
-    width: 50px;
-    height: 50px;
+    width: 30px !important;
+    height: 30px !important;
+    fill: currentColor; // Ensures the icon inherits the current text color
+    transition: fill 0.3s ease; // Smooth transition for hover effect
+  }
+
+  &:hover svg {
+    fill: green !important; // Change the icon color to green on hover
   }
 `;
 

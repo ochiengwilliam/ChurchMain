@@ -75,7 +75,7 @@ const AppHeader = () => {
         <div>
           <AppBreadcrumb />
         </div>
-
+        {/*
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink to="/dashboard" as={NavLink}>
@@ -154,7 +154,7 @@ const AppHeader = () => {
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
           <AppHeaderDropdown />
-        </CHeaderNav>
+        </CHeaderNav>*/}
       </CContainer>
     </CHeader>
   );
