@@ -8,24 +8,15 @@ import {
   CFormInput,
   CFormLabel,
   CRow,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
+  CFormSelect,
   CModal,
   CModalHeader,
   CModalBody,
   CModalFooter,
-  CFormSelect,
 } from "@coreui/react";
-import { cilTrash } from "@coreui/icons";
-import CIcon from "@coreui/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const RegistrationForm = () => {
-  const [registrationDataList, setRegistrationDataList] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -39,6 +30,7 @@ const RegistrationForm = () => {
     nationalId: "",
     mobile: "",
   });
+  const [districts, setDistricts] = useState([]);
   const [errors, setErrors] = useState({
     nationalId: "",
     mobile: "",
@@ -46,34 +38,49 @@ const RegistrationForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [isSpouseZpNoDisabled, setIsSpouseZpNoDisabled] = useState(true);
+
+  useEffect(() => {
+    // Fetch districts from the API
+    const fetchDistricts = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/districts");
+        const data = await response.json();
+        setDistricts(data);
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+      }
+    };
+
+    fetchDistricts();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validation for National ID
+    // Validation for National ID (must be numeric and exactly 8 digits)
     if (name === "nationalId") {
-      const isValid = /^\d{0,8}$/.test(value);
-      const startsWithZero = value.startsWith("0");
-      if (value.length > 8 || (value.length === 8 && startsWithZero)) {
+      if (/^\d*$/.test(value) && value.length <= 8) {
+        setFormData((prev) => ({ ...prev, nationalId: value }));
+        setErrors((prev) => ({ ...prev, nationalId: "" }));
+      } else {
         setErrors((prev) => ({
           ...prev,
-          nationalId: "National ID must be 8 digits and cannot start with 0.",
+          nationalId: "National ID must be numeric and no more than 8 digits.",
         }));
-      } else {
-        setErrors((prev) => ({ ...prev, nationalId: "" }));
       }
     }
 
-    // Validation for Mobile Number
+    // Validation for Mobile Number (must be numeric and exactly 10 digits)
     if (name === "mobile") {
-      const isValid = /^\d{0,9}$/.test(value);
-      if (value.length > 9) {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prev) => ({ ...prev, mobile: value }));
+        setErrors((prev) => ({ ...prev, mobile: "" }));
+      } else {
         setErrors((prev) => ({
           ...prev,
-          mobile: "Mobile number must be exactly 9 digits.",
+          mobile: "Mobile number must be numeric and no more than 10 digits.",
         }));
-      } else {
-        setErrors((prev) => ({ ...prev, mobile: "" }));
       }
     }
 
@@ -81,6 +88,12 @@ const RegistrationForm = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleMaritalStatusChange = (e) => {
+    const maritalStatus = e.target.value;
+    setFormData({ ...formData, maritalStatus });
+    setIsSpouseZpNoDisabled(maritalStatus !== "Married");
   };
 
   const handleSubmit = async (e) => {
@@ -104,9 +117,6 @@ const RegistrationForm = () => {
       const result = await response.json();
       console.log("Data successfully posted:", result);
 
-      setRegistrationDataList((prevList) => [...prevList, formData]);
-
-      // Reset form data after successful submission
       setFormData({
         firstName: "",
         middleName: "",
@@ -133,19 +143,10 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleLinkCard = (index) => {
-    console.log("Link Card action for:", registrationDataList[index]);
-  };
-
-  const handleDelinkCard = (index) => {
-    console.log("Delink Card action for:", registrationDataList[index]);
-  };
-
   return (
     <>
       <CRow className="justify-content-md-center">
         <CCol xs={10}>
-          {/* Registration Card */}
           <CCard
             className="mb-4"
             style={{
@@ -159,6 +160,7 @@ const RegistrationForm = () => {
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
+                {/* Personal Information */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -220,7 +222,7 @@ const RegistrationForm = () => {
                     <CFormInput
                       id="dob"
                       name="dob"
-                      type="date" // Set input type to date
+                      type="date"
                       value={formData.dob}
                       onChange={handleChange}
                       required
@@ -228,6 +230,7 @@ const RegistrationForm = () => {
                   </CCol>
                 </CRow>
 
+                {/* District and ZP Number */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -236,14 +239,20 @@ const RegistrationForm = () => {
                     >
                       District
                     </CFormLabel>
-                    <CFormInput
+                    <CFormSelect
                       id="district"
                       name="district"
                       value={formData.district}
                       onChange={handleChange}
-                      placeholder="Enter district"
                       required
-                    />
+                    >
+                      <option value="">Select a district</option>
+                      {districts.map((district) => (
+                        <option key={district.id} value={district.districtName}>
+                          {district.districtName}
+                        </option>
+                      ))}
+                    </CFormSelect>
                   </CCol>
                   <CCol md="6">
                     <CFormLabel
@@ -263,6 +272,7 @@ const RegistrationForm = () => {
                   </CCol>
                 </CRow>
 
+                {/* Marital Status and Spouse ZP Number */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -275,7 +285,7 @@ const RegistrationForm = () => {
                       id="maritalStatus"
                       name="maritalStatus"
                       value={formData.maritalStatus}
-                      onChange={handleChange}
+                      onChange={handleMaritalStatusChange}
                       required
                     >
                       <option value="">Select</option>
@@ -284,24 +294,6 @@ const RegistrationForm = () => {
                       <option value="Single">Single</option>
                     </CFormSelect>
                   </CCol>
-                  <CCol md="6">
-                    <CFormLabel
-                      htmlFor="spouseName"
-                      style={{ color: "blue", fontWeight: "bold" }}
-                    >
-                      Spouse Name
-                    </CFormLabel>
-                    <CFormInput
-                      id="spouseName"
-                      name="spouseName"
-                      value={formData.spouseName}
-                      onChange={handleChange}
-                      placeholder="Enter spouse name"
-                    />
-                  </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
                       htmlFor="spouseZpNo"
@@ -314,9 +306,14 @@ const RegistrationForm = () => {
                       name="spouseZpNo"
                       value={formData.spouseZpNo}
                       onChange={handleChange}
-                      placeholder="Enter spouse ZP number"
+                      placeholder="Enter Spouse ZP number"
+                      disabled={isSpouseZpNoDisabled}
                     />
                   </CCol>
+                </CRow>
+
+                {/* National ID and Mobile */}
+                <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
                       htmlFor="nationalId"
@@ -329,17 +326,13 @@ const RegistrationForm = () => {
                       name="nationalId"
                       value={formData.nationalId}
                       onChange={handleChange}
-                      placeholder="Enter National ID"
+                      placeholder="Enter national ID"
                       required
-                      maxLength={8}
                     />
                     {errors.nationalId && (
-                      <div style={{ color: "red" }}>{errors.nationalId}</div>
+                      <span style={{ color: "red" }}>{errors.nationalId}</span>
                     )}
                   </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
                       htmlFor="mobile"
@@ -352,12 +345,11 @@ const RegistrationForm = () => {
                       name="mobile"
                       value={formData.mobile}
                       onChange={handleChange}
-                      placeholder="Enter Mobile Number"
+                      placeholder="Enter mobile number"
                       required
-                      maxLength={10}
                     />
                     {errors.mobile && (
-                      <div style={{ color: "red" }}>{errors.mobile}</div>
+                      <span style={{ color: "red" }}>{errors.mobile}</span>
                     )}
                   </CCol>
                 </CRow>
@@ -368,67 +360,17 @@ const RegistrationForm = () => {
               </CForm>
             </CCardBody>
           </CCard>
-
-          {/* Registration Data Table */}
-          <CTable striped hover>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell>First Name</CTableHeaderCell>
-                <CTableHeaderCell>Middle Name</CTableHeaderCell>
-                <CTableHeaderCell>Surname</CTableHeaderCell>
-                <CTableHeaderCell>Date of Birth</CTableHeaderCell>
-                <CTableHeaderCell>District</CTableHeaderCell>
-                <CTableHeaderCell>ZP Number</CTableHeaderCell>
-                <CTableHeaderCell>Marital Status</CTableHeaderCell>
-                <CTableHeaderCell>Spouse Name</CTableHeaderCell>
-                <CTableHeaderCell>Spouse ZP Number</CTableHeaderCell>
-                <CTableHeaderCell>National ID</CTableHeaderCell>
-                <CTableHeaderCell>Mobile</CTableHeaderCell>
-                <CTableHeaderCell>Actions</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {registrationDataList.map((data, index) => (
-                <CTableRow key={index}>
-                  <CTableDataCell>{data.firstName}</CTableDataCell>
-                  <CTableDataCell>{data.middleName}</CTableDataCell>
-                  <CTableDataCell>{data.surname}</CTableDataCell>
-                  <CTableDataCell>{data.dob}</CTableDataCell>
-                  <CTableDataCell>{data.district}</CTableDataCell>
-                  <CTableDataCell>{data.zpNo}</CTableDataCell>
-                  <CTableDataCell>{data.maritalStatus}</CTableDataCell>
-                  <CTableDataCell>{data.spouseName}</CTableDataCell>
-                  <CTableDataCell>{data.spouseZpNo}</CTableDataCell>
-                  <CTableDataCell>{data.nationalId}</CTableDataCell>
-                  <CTableDataCell>{data.mobile}</CTableDataCell>
-                  <CTableDataCell>
-                    <CButton color="link" onClick={() => handleLinkCard(index)}>
-                      Link
-                    </CButton>
-                    <CButton
-                      color="link"
-                      onClick={() => handleDelinkCard(index)}
-                    >
-                      <CIcon icon={cilTrash} />
-                    </CButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
         </CCol>
       </CRow>
 
-      {/* Modal for Feedback */}
-      <CModal
-        visible={showModal}
-        onClose={() => setShowModal(false)}
-        color={isError ? "danger" : "success"}
-      >
-        <CModalHeader closeButton>
+      {/* Modal */}
+      <CModal visible={showModal} onClose={() => setShowModal(false)}>
+        <CModalHeader>
           <h5>{isError ? "Error" : "Success"}</h5>
         </CModalHeader>
-        <CModalBody>{modalMessage}</CModalBody>
+        <CModalBody>
+          <p>{modalMessage}</p>
+        </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>
             Close

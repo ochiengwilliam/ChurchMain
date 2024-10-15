@@ -15,9 +15,16 @@ import {
   CTableRow,
   CTableDataCell,
   CTableBody,
+  CModal,
+  CModalHeader,
+  CModalBody,
+  CModalFooter,
 } from "@coreui/react";
 import { cilTrash } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
+
+import successSvg from "src/assets/images/avatars/13.svg";
+import errorPng from "src/assets/images/avatars/14.png";
 
 function ElderForm() {
   const [formData, setFormData] = useState({
@@ -29,6 +36,15 @@ function ElderForm() {
   });
 
   const [elderDataList, setElderDataList] = useState([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
+  const [showErrorModal, setShowErrorModal] = useState(false); // Error modal state
+
+  // Auto-close modal after 2.5 seconds
+  const autoCloseModal = (setShowModal) => {
+    setTimeout(() => {
+      setShowModal(false);
+    }, 2500); // 2.5 seconds
+  };
 
   // Handle form field changes
   const handleChange = (e) => {
@@ -66,26 +82,53 @@ function ElderForm() {
           elderZP: "",
           createdBy: "",
         });
+
+        // Show success modal and auto-close after 2.5 seconds
+        setShowSuccessModal(true);
+        autoCloseModal(setShowSuccessModal);
       } else {
         console.error("Failed to add elder.");
+        setShowErrorModal(true);
+        autoCloseModal(setShowErrorModal);
       }
     } catch (error) {
       console.error("Error posting elder data:", error);
+      setShowErrorModal(true);
+      autoCloseModal(setShowErrorModal);
     }
   };
 
   const handleEdit = (index) => {
     // Logic for handling elder data editing
-    // You can implement this function to allow editing of elder records
   };
 
   const handleDelete = (index) => {
     // Logic for handling elder data deletion
-    // You can implement this function to allow deletion of elder records
   };
 
   return (
     <>
+      {/* Success Modal */}
+      <CModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+      >
+        <CModalHeader>Success</CModalHeader>
+        <CModalBody className="text-center">
+          <img src={successSvg} alt="Success" style={{ width: "150px" }} />
+          <p>Elder successfully added!</p>
+        </CModalBody>
+      </CModal>
+
+      {/* Error Modal */}
+      <CModal visible={showErrorModal} onClose={() => setShowErrorModal(false)}>
+        <CModalHeader>Error</CModalHeader>
+        <CModalBody className="text-center">
+          <img src={errorPng} alt="Error" style={{ width: "150px" }} />
+          <p>Failed to add elder. Please try again.</p>
+        </CModalBody>
+      </CModal>
+
       <CCard
         className="mb-4"
         style={{

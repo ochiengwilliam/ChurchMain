@@ -22,11 +22,11 @@ import {
   CNav,
   CNavItem,
   CNavLink,
-  CSpinner,
 } from "@coreui/react";
+import "ldrs/zoomies"; // Import the zoomies loader
 
 const Visitors = () => {
-  const [activeTab, setActiveTab] = useState("registration"); // Manage active tab
+  const [activeTab, setActiveTab] = useState("registration");
   const [visitorDataList, setVisitorDataList] = useState([]);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -289,27 +289,30 @@ const Visitors = () => {
               <CCardBody>
                 {loading ? (
                   <div className="text-center">
-                    <CSpinner color="primary" />
-                    <p>Loading visitors...</p>
+                    {/* Replace CSpinner with zoomies loader */}
+                    <l-zoomies
+                      size="80"
+                      stroke="5"
+                      bg-opacity="0.1"
+                      speed="1.2"
+                    ></l-zoomies>
                   </div>
-                ) : visitorDataList.length > 0 ? (
-                  <CTable striped>
+                ) : (
+                  <CTable striped hover responsive>
                     <CTableHead>
                       <CTableRow>
-                        <CTableHeaderCell>#</CTableHeaderCell>
                         <CTableHeaderCell>First Name</CTableHeaderCell>
                         <CTableHeaderCell>Middle Name</CTableHeaderCell>
                         <CTableHeaderCell>Surname</CTableHeaderCell>
                         <CTableHeaderCell>National ID</CTableHeaderCell>
-                        <CTableHeaderCell>Mobile Number</CTableHeaderCell>
+                        <CTableHeaderCell>Mobile</CTableHeaderCell>
                         <CTableHeaderCell>Address</CTableHeaderCell>
                         <CTableHeaderCell>Gender</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                      {visitorDataList.map((visitor, index) => (
-                        <CTableRow key={index}>
-                          <CTableDataCell>{index + 1}</CTableDataCell>
+                      {visitorDataList.map((visitor) => (
+                        <CTableRow key={visitor.id}>
                           <CTableDataCell>{visitor.firstName}</CTableDataCell>
                           <CTableDataCell>{visitor.middleName}</CTableDataCell>
                           <CTableDataCell>{visitor.surname}</CTableDataCell>
@@ -321,8 +324,6 @@ const Visitors = () => {
                       ))}
                     </CTableBody>
                   </CTable>
-                ) : (
-                  <p>No visitors found.</p>
                 )}
               </CCardBody>
             </CCard>
@@ -330,19 +331,14 @@ const Visitors = () => {
         </CCol>
       </CRow>
 
-      {/* Success/Error Modal */}
+      {/* Modal */}
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader onClose={() => setShowModal(false)}>
-          {isError ? "Registration Error" : "Registration Successful"}
+          {isError ? "Error" : "Success"}
         </CModalHeader>
-        <CModalBody>
-          <p>{modalMessage}</p>
-        </CModalBody>
+        <CModalBody>{modalMessage}</CModalBody>
         <CModalFooter>
-          <CButton
-            color={isError ? "danger" : "success"}
-            onClick={() => setShowModal(false)}
-          >
+          <CButton color="secondary" onClick={() => setShowModal(false)}>
             Close
           </CButton>
         </CModalFooter>

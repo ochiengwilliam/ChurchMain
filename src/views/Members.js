@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CCard,
   CTable,
@@ -23,105 +23,47 @@ import {
   CNav,
   CNavItem,
   CNavLink,
-  CTabContent,
-  CTabPane,
 } from "@coreui/react";
 import { FiSearch } from "react-icons/fi";
+import "ldrs/zoomies"; // Import the zoomies loader
 
 const Members = () => {
   const [visible, setVisible] = useState(false);
   const [selectedMember, setSelectedMember] = useState({});
-  const [cardNumber, setCardNumber] = useState(""); // New state for card number
-  const [cardSerialNumber, setCardSerialNumber] = useState(""); // New state for card serial number
+  const [cardNumber, setCardNumber] = useState(""); // State for card number
+  const [cardSerialNumber, setCardSerialNumber] = useState(""); // State for card serial number
   const [searchFirstName, setSearchFirstName] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
-  const [activeTab, setActiveTab] = useState(1); // 1: All, 2: Receiving, 3: Non-Receiving
+  const [activeTab, setActiveTab] = useState("all"); // 'all', 'receiving', 'nonReceiving'
+  const [members, setMembers] = useState([]); // State to store members
+  const [loading, setLoading] = useState(true); // Loading state
+
+  // Fetch members from the backend on component mount
+  useEffect(() => {
+    const fetchMembers = async () => {
+      setLoading(true); // Start loading
+      try {
+        const response = await fetch("http://localhost:8080/api/registration");
+        const data = await response.json();
+        setMembers(data);
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    fetchMembers();
+  }, []);
 
   const handleAssignCardClick = (member) => {
     setSelectedMember(member);
     setVisible(true);
   };
 
-  const members = [
-    {
-      id: 1,
-      firstName: "Mark",
-      lastName: "Otto",
-      mobile: "@mdo",
-      email: "otto@gmail.com",
-      receiving: true,
-    },
-    {
-      id: 2,
-      firstName: "Jacob",
-      lastName: "Thornton",
-      mobile: "@fat",
-      email: "otto@gmail.com",
-      receiving: true,
-    },
-    {
-      id: 3,
-      firstName: "Larry",
-      lastName: "Bird",
-      mobile: "@twitter",
-      email: "otto@gmail.com",
-      receiving: true,
-    },
-
-    {
-      id: 4,
-      firstName: "Robbie",
-      lastName: "Right",
-      mobile: "01150010978",
-      email: "robbie@gmail.com",
-      receiving: false,
-    },
-
-    {
-      id: 5,
-      firstName: "Ashley",
-      lastName: "Williams",
-      mobile: "737872387918",
-      email: "ashley@gmail.com",
-      receiving: false,
-    },
-
-    {
-      id: 6,
-      firstName: "Ramsey",
-      lastName: "Bolton",
-      mobile: "34567890897654",
-      email: "ramsey@gmail.com",
-      receiving: true,
-    },
-
-    {
-      id: 7,
-      firstName: "Leannah",
-      lastName: "Smith",
-      mobile: "7881479894891",
-      email: "leannah@gmail.com",
-      receiving: false,
-    },
-
-    {
-      id: 8,
-      firstName: "Rosie",
-      lastName: "Fox",
-      mobile: "7634676893",
-      email: "robbie@gmail.com",
-      receiving: true,
-    },
-  ];
-
-  const filteredMembers = members.filter(
-    (member) =>
-      member.firstName.toLowerCase().includes(searchFirstName.toLowerCase()) &&
-      member.mobile.toLowerCase().includes(searchMobile.toLowerCase()) &&
-      (activeTab === 1 ||
-        (activeTab === 2 && member.receiving) ||
-        (activeTab === 3 && !member.receiving))
-  );
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
 
   return (
     <>
@@ -129,75 +71,25 @@ const Members = () => {
         className="mb-4"
         style={{
           boxShadow: "0px 15px 34px 0px rgba(0,0,0,0.2)",
-          color: "light-gray",
           padding: "10px",
           borderRadius: "5px",
         }}
       >
-        {/* Tabs for All, Receiving, and Non-Receiving Members */}
-        <CNav
-          variant="pills"
-          className="d-flex justify-content-center"
-          role="tablist"
-        >
+        {/* Tabs for All Members */}
+        <CNav variant="tabs" role="tablist">
           <CNavItem>
             <CNavLink
-              active={activeTab === 1}
-              onClick={() => setActiveTab(1)}
-              style={{
-                margin: "0 5px",
-                borderRadius: "100px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
+              active={activeTab === "all"}
+              onClick={() => handleTabClick("all")}
+              style={{ cursor: "pointer", fontWeight: "bold" }}
             >
               All Members
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink
-              active={activeTab === 2}
-              onClick={() => setActiveTab(2)}
-              style={{
-                margin: "0 5px",
-                borderRadius: "100px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              Holy Communion
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink
-              active={activeTab === 3}
-              onClick={() => setActiveTab(3)}
-              style={{
-                margin: "0 5px",
-                borderRadius: "100px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              Non-Receiving Members
-            </CNavLink>
-          </CNavItem>
         </CNav>
 
-        <CTabContent>
-          <CTabPane visible={activeTab === 1}>
-            <h4 style={{ color: "blue" }}>All Members</h4>
-          </CTabPane>
-          <CTabPane visible={activeTab === 2}>
-            <h4 style={{ color: "blue" }}>Receiving Members</h4>
-          </CTabPane>
-          <CTabPane visible={activeTab === 3}>
-            <h4 style={{ color: "blue" }}>Non-Receiving Members</h4>
-          </CTabPane>
-        </CTabContent>
-
         {/* Search Inputs */}
-        <CInputGroup className="mb-3">
+        <CInputGroup className="mb-3 mt-3">
           <CInputGroupText>
             <FiSearch />
           </CInputGroupText>
@@ -219,53 +111,73 @@ const Members = () => {
           />
         </CInputGroup>
 
-        {/* Table to display filtered members */}
-        <CTable striped>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
-              <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
-              <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Mobile Number</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Email</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {filteredMembers.map((member) => (
-              <CTableRow key={member.id}>
-                <CTableHeaderCell scope="row">{member.id}</CTableHeaderCell>
-                <CTableDataCell>{member.firstName}</CTableDataCell>
-                <CTableDataCell>{member.lastName || "-"}</CTableDataCell>
-                <CTableDataCell></CTableDataCell>{" "}
-                {/* National ID column left empty */}
-                <CTableDataCell>{member.mobile}</CTableDataCell>
-                <CTableDataCell>{member.email}</CTableDataCell>
-                <CTableDataCell>
-                  <div>
-                    <CDropdown alignment="end">
-                      <CDropdownToggle
-                        color="success"
-                        style={{ color: "#fff", fontWeight: "bold" }}
-                      >
-                        Action
-                      </CDropdownToggle>
-                      <CDropdownMenu>
-                        <CDropdownItem
-                          onClick={() => handleAssignCardClick(member)}
-                        >
-                          Assign Card
-                        </CDropdownItem>
-                        <CDropdownItem>Delete</CDropdownItem>
-                      </CDropdownMenu>
-                    </CDropdown>
-                  </div>
-                </CTableDataCell>
+        {/* Loading Indicator */}
+        {loading ? (
+          <div className="text-center">
+            <l-zoomies
+              size="80"
+              stroke="5"
+              bg-opacity="0.1"
+              speed="1.4"
+              color="black"
+            ></l-zoomies>
+            <p>Loading members...</p>
+          </div>
+        ) : (
+          <CTable striped>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
+                <CTableHeaderCell scope="col">ZP Number</CTableHeaderCell>
+                <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Phone Number</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Action</CTableHeaderCell>
               </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
+            </CTableHead>
+            <CTableBody>
+              {members
+                .filter(
+                  (member) =>
+                    member.firstName
+                      .toLowerCase()
+                      .includes(searchFirstName.toLowerCase()) &&
+                    member.mobile
+                      .toLowerCase()
+                      .includes(searchMobile.toLowerCase())
+                )
+                .map((member, index) => (
+                  <CTableRow key={member.id}>
+                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                    <CTableDataCell>{member.firstName}</CTableDataCell>
+                    <CTableDataCell>{member.surname}</CTableDataCell>
+                    <CTableDataCell>{member.zpNo || "-"}</CTableDataCell>
+                    <CTableDataCell>{member.nationalId || "-"}</CTableDataCell>
+                    <CTableDataCell>{member.mobile || "-"}</CTableDataCell>
+                    <CTableDataCell>
+                      <CDropdown alignment="end">
+                        <CDropdownToggle
+                          color="success"
+                          style={{ color: "#fff", fontWeight: "bold" }}
+                        >
+                          Action
+                        </CDropdownToggle>
+                        <CDropdownMenu>
+                          <CDropdownItem
+                            onClick={() => handleAssignCardClick(member)}
+                          >
+                            Assign Card
+                          </CDropdownItem>
+                          <CDropdownItem>Delete</CDropdownItem>
+                        </CDropdownMenu>
+                      </CDropdown>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+            </CTableBody>
+          </CTable>
+        )}
       </CCard>
 
       {/* Modal for assigning card */}
@@ -278,7 +190,7 @@ const Members = () => {
             <strong>First Name:</strong> {selectedMember.firstName}
           </p>
           <p>
-            <strong>Surname:</strong> {selectedMember.lastName || "-"}
+            <strong>Surname:</strong> {selectedMember.surname || "-"}
           </p>
           <p>
             <strong>Mobile Number:</strong> {selectedMember.mobile}
@@ -308,9 +220,11 @@ const Members = () => {
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
+            Cancel
           </CButton>
-          <CButton color="primary">Assign</CButton>
+          <CButton color="primary" onClick={() => setVisible(false)}>
+            Assign Card
+          </CButton>
         </CModalFooter>
       </CModal>
     </>

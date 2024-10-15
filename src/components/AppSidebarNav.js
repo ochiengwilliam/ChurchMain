@@ -14,12 +14,12 @@ const NavIcon = styled.span`
   svg {
     width: 30px !important;
     height: 30px !important;
-    fill: currentColor; // Ensures the icon inherits the current text color
-    transition: fill 0.3s ease; // Smooth transition for hover effect
+    fill: currentColor;
+    transition: fill 0.3s ease;
   }
 
   &:hover svg {
-    fill: green !important; // Change the icon color to green on hover
+    fill: green !important;
   }
 `;
 
