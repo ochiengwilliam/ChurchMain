@@ -23,6 +23,8 @@ import {
   CNav,
   CNavItem,
   CNavLink,
+  CPagination,
+  CPaginationItem,
 } from "@coreui/react";
 import { FiSearch } from "react-icons/fi";
 import "ldrs/zoomies"; // Import the zoomies loader
@@ -37,6 +39,8 @@ const Members = () => {
   const [activeTab, setActiveTab] = useState("all"); // 'all', 'receiving', 'nonReceiving'
   const [members, setMembers] = useState([]); // State to store members
   const [loading, setLoading] = useState(true); // Loading state
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const membersPerPage = 10; // Number of members per page
 
   // Fetch members from the backend on component mount
   useEffect(() => {
@@ -55,6 +59,20 @@ const Members = () => {
 
     fetchMembers();
   }, []);
+
+  // Calculate the number of pages
+  const totalPages = Math.ceil(members.length / membersPerPage);
+
+  // Get the members for the current page
+  const paginatedMembers = members
+    .filter(
+      (member) =>
+        member.firstName
+          .toLowerCase()
+          .includes(searchFirstName.toLowerCase()) &&
+        member.mobile.toLowerCase().includes(searchMobile.toLowerCase())
+    )
+    .slice((currentPage - 1) * membersPerPage, currentPage * membersPerPage);
 
   const handleAssignCardClick = (member) => {
     setSelectedMember(member);
@@ -124,32 +142,25 @@ const Members = () => {
             <p>Loading members...</p>
           </div>
         ) : (
-          <CTable striped>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
-                <CTableHeaderCell scope="col">ZP Number</CTableHeaderCell>
-                <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Phone Number</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Action</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {members
-                .filter(
-                  (member) =>
-                    member.firstName
-                      .toLowerCase()
-                      .includes(searchFirstName.toLowerCase()) &&
-                    member.mobile
-                      .toLowerCase()
-                      .includes(searchMobile.toLowerCase())
-                )
-                .map((member, index) => (
+          <>
+            <CTable striped>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">ZP Number</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Phone Number</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {paginatedMembers.map((member, index) => (
                   <CTableRow key={member.id}>
-                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                    <CTableHeaderCell scope="row">
+                      {(currentPage - 1) * membersPerPage + index + 1}
+                    </CTableHeaderCell>
                     <CTableDataCell>{member.firstName}</CTableDataCell>
                     <CTableDataCell>{member.surname}</CTableDataCell>
                     <CTableDataCell>{member.zpNo || "-"}</CTableDataCell>
@@ -175,8 +186,36 @@ const Members = () => {
                     </CTableDataCell>
                   </CTableRow>
                 ))}
-            </CTableBody>
-          </CTable>
+              </CTableBody>
+            </CTable>
+
+            {/* Pagination Controls */}
+            <CPagination className="mt-3">
+              <CPaginationItem
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </CPaginationItem>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <CPaginationItem
+                  key={index + 1}
+                  active={index + 1 === currentPage}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </CPaginationItem>
+              ))}
+              <CPaginationItem
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </CPaginationItem>
+            </CPagination>
+          </>
         )}
       </CCard>
 

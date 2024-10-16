@@ -51,6 +51,28 @@ const Employee = () => {
   // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (["firstName", "middleName", "lastName"].includes(name)) {
+      if (/^[A-Za-z]*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return; // Exit if it's one of the name fields (prevents further logic below)
+    }
+
+    if (name === "nationalId") {
+      if (/^\d*$/.test(value) && value.length <= 8) {
+        setFormData((prev) => ({ ...prev, nationalId: value }));
+      }
+      return; // Stop further execution for nationalId field
+    }
+
+    if (name === "mobile") {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prev) => ({ ...prev, mobile: value }));
+      }
+      return; // Stop further execution for mobile field
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -214,7 +236,7 @@ const Employee = () => {
                         htmlFor="lastName"
                         style={{ fontWeight: "bold" }}
                       >
-                        Last Name
+                        Surname
                       </CFormLabel>
                       <CFormInput
                         id="lastName"
@@ -294,7 +316,7 @@ const Employee = () => {
                         <CTableHeaderCell>#</CTableHeaderCell>
                         <CTableHeaderCell>First Name</CTableHeaderCell>
                         <CTableHeaderCell>Middle Name</CTableHeaderCell>
-                        <CTableHeaderCell>Last Name</CTableHeaderCell>
+                        <CTableHeaderCell>Surname</CTableHeaderCell>
                         <CTableHeaderCell>National ID</CTableHeaderCell>
                         <CTableHeaderCell>Mobile Number</CTableHeaderCell>
                       </CTableRow>

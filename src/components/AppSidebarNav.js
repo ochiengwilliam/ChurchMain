@@ -9,7 +9,6 @@ import "../scss/nav1.css";
 import { CBadge, CNavLink, CSidebarNav } from "@coreui/react";
 import styled from "styled-components";
 
-// Define a styled-component for NavIcon to adjust SVG icon size and hover effect
 const NavIcon = styled.span`
   svg {
     width: 30px !important;
@@ -28,7 +27,7 @@ export const AppSidebarNav = ({ items }) => {
     return (
       <>
         {icon ? (
-          <NavIcon>{icon}</NavIcon> // Wrap the icon with NavIcon styled component
+          <NavIcon>{icon}</NavIcon>
         ) : (
           indent && (
             <span className="nav-icon">

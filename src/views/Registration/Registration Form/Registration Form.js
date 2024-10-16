@@ -58,17 +58,26 @@ const RegistrationForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Allow only alphabetic input for firstName, middleName, and surname
+    if (["firstName", "middleName", "surname"].includes(name)) {
+      if (/^[A-Za-z]*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return; // Exit if it's one of the name fields (prevents further logic below)
+    }
+
     // Validation for National ID (must be numeric and exactly 8 digits)
     if (name === "nationalId") {
       if (/^\d*$/.test(value) && value.length <= 8) {
         setFormData((prev) => ({ ...prev, nationalId: value }));
         setErrors((prev) => ({ ...prev, nationalId: "" }));
-      } else {
+      } else if (value.length > 8) {
         setErrors((prev) => ({
           ...prev,
-          nationalId: "National ID must be numeric and no more than 8 digits.",
+          nationalId: "",
         }));
       }
+      return;
     }
 
     // Validation for Mobile Number (must be numeric and exactly 10 digits)
@@ -76,14 +85,14 @@ const RegistrationForm = () => {
       if (/^\d*$/.test(value) && value.length <= 10) {
         setFormData((prev) => ({ ...prev, mobile: value }));
         setErrors((prev) => ({ ...prev, mobile: "" }));
-      } else {
+      } else if (value.length > 10) {
         setErrors((prev) => ({
           ...prev,
-          mobile: "Mobile number must be numeric and no more than 10 digits.",
+          mobile: "",
         }));
       }
+      return;
     }
-
     setFormData({
       ...formData,
       [name]: value,

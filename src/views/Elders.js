@@ -38,6 +38,7 @@ function ElderForm() {
   const [elderDataList, setElderDataList] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
   const [showErrorModal, setShowErrorModal] = useState(false); // Error modal state
+  const [nameError, setNameError] = useState(""); // Error state for Full Name
 
   // Auto-close modal after 2.5 seconds
   const autoCloseModal = (setShowModal) => {
@@ -46,15 +47,42 @@ function ElderForm() {
     }, 2500); // 2.5 seconds
   };
 
-  // Handle form field changes
+  // Validate Full Name to only allow alphabets and spaces
+  const validateName = (name) => {
+    const nameRegex = /^[a-zA-Z\s]+$/; // Only alphabets and spaces
+    if (!nameRegex.test(name)) {
+      setNameError("Input valid name.");
+      return false;
+    }
+    setNameError(""); // Clear error if valid
+    return true;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // If the name field is being updated, validate it, but allow empty values
+    if (name === "name") {
+      if (value === "" || validateName(value)) {
+        setFormData({ ...formData, [name]: value });
+        return; // Stop further processing if name is valid or empty
+      } else {
+        return; // Stop if the input is invalid
+      }
+    }
+
+    // Update form data for all fields
     setFormData({ ...formData, [name]: value });
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate the full name before submission
+    if (!validateName(formData.name)) {
+      return; // Prevent submission if validation fails
+    }
 
     try {
       // Add createdAt field with current timestamp
@@ -158,6 +186,9 @@ function ElderForm() {
                   placeholder="Enter name"
                   required
                 />
+                {nameError && (
+                  <p style={{ color: "red", fontSize: "14px" }}>{nameError}</p>
+                )}
               </CCol>
               <CCol md="6">
                 <CFormLabel

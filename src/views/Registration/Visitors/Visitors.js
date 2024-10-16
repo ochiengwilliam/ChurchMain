@@ -45,6 +45,28 @@ const Visitors = () => {
   // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (["firstName", "middleName", "surname"].includes(name)) {
+      if (/^[A-Za-z]*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return; // Exit if it's one of the name fields (prevents further logic below)
+    }
+
+    if (name === "nationalId") {
+      if (/^\d*$/.test(value) && value.length <= 8) {
+        setFormData((prev) => ({ ...prev, nationalId: value }));
+      }
+      return; // Stop further execution for nationalId field
+    }
+
+    if (name === "mobile") {
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData((prev) => ({ ...prev, mobile: value }));
+      }
+      return; // Stop further execution for mobile field
+    }
+
     setFormData({
       ...formData,
       [name]: value,
