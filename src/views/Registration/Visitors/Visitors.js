@@ -109,9 +109,8 @@ const Visitors = () => {
       });
   };
 
-  // Fetch visitors from the backend
   const fetchVisitors = () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     fetch("http://localhost:8080/api/visitors")
       .then((response) => response.json())
       .then((data) => {
@@ -120,11 +119,10 @@ const Visitors = () => {
       })
       .catch((error) => {
         console.error("Error fetching visitors:", error);
-        setLoading(false); // Stop loading on error
+        setLoading(false);
       });
   };
 
-  // Effect to fetch visitors when "Visitors" tab is active
   useEffect(() => {
     if (activeTab === "visitors") {
       fetchVisitors();
@@ -317,6 +315,7 @@ const Visitors = () => {
                       stroke="5"
                       bg-opacity="0.1"
                       speed="1.2"
+                      color="blue"
                     ></l-zoomies>
                   </div>
                 ) : (

@@ -1,133 +1,197 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useState } from "react";
+import { Bar, Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-import { CChartLine } from '@coreui/react-chartjs'
-import { getStyle } from '@coreui/utils'
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  ArcElement,
+  ChartDataLabels
+);
 
 const MainChart = () => {
-  const chartRef = useRef(null)
+  const [barChartData, setBarChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  const [doughnutChartData, setDoughnutChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.documentElement.addEventListener('ColorSchemeChange', () => {
-      if (chartRef.current) {
-        setTimeout(() => {
-          chartRef.current.options.scales.x.grid.borderColor = getStyle(
-            '--cui-border-color-translucent',
-          )
-          chartRef.current.options.scales.x.grid.color = getStyle('--cui-border-color-translucent')
-          chartRef.current.options.scales.x.ticks.color = getStyle('--cui-body-color')
-          chartRef.current.options.scales.y.grid.borderColor = getStyle(
-            '--cui-border-color-translucent',
-          )
-          chartRef.current.options.scales.y.grid.color = getStyle('--cui-border-color-translucent')
-          chartRef.current.options.scales.y.ticks.color = getStyle('--cui-body-color')
-          chartRef.current.update()
-        })
-      }
-    })
-  }, [chartRef])
+    const fetchData = async () => {
+      try {
+        // Fetch total number of registrations from the API
+        const registrationResponse = await fetch(
+          "http://localhost:8080/api/registration/count"
+        );
+        const totalRegistrations = await registrationResponse.json();
 
-  const random = () => Math.round(Math.random() * 100)
+        // Fetch total number of districts from the API
+        const districtResponse = await fetch(
+          "http://localhost:8080/api/districts/count"
+        );
+        const totalDistricts = await districtResponse.json();
 
-  return (
-    <>
-      <CChartLine
-        ref={chartRef}
-        style={{ height: '300px', marginTop: '40px' }}
-        data={{
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        // Fetch total number of elders from the API
+        const elderResponse = await fetch(
+          "http://localhost:8080/api/elders/count"
+        );
+        const totalElders = await elderResponse.json();
+
+        // Fetch total number of visitors from the API
+        const visitorResponse = await fetch(
+          "http://localhost:8080/api/visitors/count"
+        );
+        const totalVisitors = await visitorResponse.json();
+
+        // Prepare data for the bar chart
+        const chartLabels = [
+          "Total Registrations",
+          "Total Districts",
+          "Total Elders",
+          "Total Visitors",
+        ];
+        const chartDataValues = [
+          totalRegistrations,
+          totalDistricts,
+          totalElders,
+          totalVisitors,
+        ];
+        const chartColors = ["green", "blue", "yellow", "maroon"];
+
+        setBarChartData({
+          labels: chartLabels,
           datasets: [
             {
-              label: 'My First dataset',
-              backgroundColor: `rgba(${getStyle('--cui-info-rgb')}, .1)`,
-              borderColor: getStyle('--cui-info'),
-              pointHoverBackgroundColor: getStyle('--cui-info'),
-              borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
-              fill: true,
-            },
-            {
-              label: 'My Second dataset',
-              backgroundColor: 'transparent',
-              borderColor: getStyle('--cui-success'),
-              pointHoverBackgroundColor: getStyle('--cui-success'),
-              borderWidth: 2,
-              data: [
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-                random(50, 200),
-              ],
-            },
-            {
-              label: 'My Third dataset',
-              backgroundColor: 'transparent',
-              borderColor: getStyle('--cui-danger'),
-              pointHoverBackgroundColor: getStyle('--cui-danger'),
-              borderWidth: 1,
-              borderDash: [8, 5],
-              data: [65, 65, 65, 65, 65, 65, 65],
+              label: "Statistics",
+              backgroundColor: chartColors,
+              data: chartDataValues,
             },
           ],
-        }}
-        options={{
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-          scales: {
-            x: {
-              grid: {
-                color: getStyle('--cui-border-color-translucent'),
-                drawOnChartArea: false,
-              },
-              ticks: {
-                color: getStyle('--cui-body-color'),
-              },
-            },
-            y: {
-              beginAtZero: true,
-              border: {
-                color: getStyle('--cui-border-color-translucent'),
-              },
-              grid: {
-                color: getStyle('--cui-border-color-translucent'),
-              },
-              max: 250,
-              ticks: {
-                color: getStyle('--cui-body-color'),
-                maxTicksLimit: 5,
-                stepSize: Math.ceil(250 / 5),
-              },
-            },
-          },
-          elements: {
-            line: {
-              tension: 0.4,
-            },
-            point: {
-              radius: 0,
-              hitRadius: 10,
-              hoverRadius: 4,
-              hoverBorderWidth: 3,
-            },
-          },
-        }}
-      />
-    </>
-  )
-}
+        });
 
-export default MainChart
+        // Prepare data for the doughnut chart using the same data as the bar chart
+        setDoughnutChartData({
+          labels: chartLabels,
+          datasets: [
+            {
+              backgroundColor: chartColors,
+              data: chartDataValues,
+            },
+          ],
+        });
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Run once when component mounts
+
+  const barChartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          color: "#000",
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          color: "#e0e0e0",
+        },
+        ticks: {
+          color: "#000",
+        },
+      },
+      y: {
+        grid: {
+          color: "#e0e0e0",
+        },
+        ticks: {
+          color: "#000",
+        },
+      },
+    },
+    maintainAspectRatio: false,
+  };
+
+  const doughnutChartOptions = {
+    plugins: {
+      legend: {
+        labels: {
+          color: "#000",
+        },
+      },
+      datalabels: {
+        formatter: (value, context) => {
+          return context.chart.data.labels[context.dataIndex];
+        },
+        color: "#fff",
+        font: {
+          weight: "bold",
+          size: 14,
+        },
+      },
+    },
+  };
+
+  if (loading) return <p>Loading charts...</p>;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+      <div
+        style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          borderRadius: "8px",
+          width: "800px",
+          margin: "0 auto",
+        }}
+      >
+        <h3 style={{ textAlign: "center" }}>Bar Chart: Statistics Overview</h3>
+        <div style={{ width: "100%", height: "400px" }}>
+          <Bar data={barChartData} options={barChartOptions} />
+        </div>
+      </div>
+
+      <div
+        style={{
+          backgroundColor: "#fff",
+          padding: "20px",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          borderRadius: "8px",
+          width: "600px",
+          margin: "0 auto",
+        }}
+      >
+        <h3 style={{ textAlign: "center" }}>
+          Doughnut Chart: Section Breakdown
+        </h3>
+        <div style={{ width: "100%", height: "600px" }}>
+          <Doughnut data={doughnutChartData} options={doughnutChartOptions} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MainChart;

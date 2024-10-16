@@ -23,7 +23,7 @@ import {
   CModalBody,
   CModalFooter,
 } from "@coreui/react";
-import "ldrs/zoomies"; // Import the zoomies loader
+import "ldrs/zoomies";
 import successSvg from "src/assets/images/avatars/13.svg";
 import errorPng from "src/assets/images/avatars/14.png";
 
@@ -37,40 +37,43 @@ const Employee = () => {
     nationalId: "",
     mobile: "",
   });
-  const [loading, setLoading] = useState(false); // Loading state for employees
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
-  const [showErrorModal, setShowErrorModal] = useState(false); // Error modal state
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // Close modal automatically after 2.5 seconds
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  // Assuming button color is #007bff (Bootstrap's primary)
+  const blueColor = "#007bff";
+
   const autoCloseModal = (setShowModal) => {
     setTimeout(() => {
       setShowModal(false);
-    }, 2500); // 2.5 seconds
+    }, 2000);
   };
 
-  // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (["firstName", "middleName", "lastName"].includes(name)) {
       if (/^[A-Za-z]*$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
-      return; // Exit if it's one of the name fields (prevents further logic below)
+      return;
     }
 
     if (name === "nationalId") {
       if (/^\d*$/.test(value) && value.length <= 8) {
         setFormData((prev) => ({ ...prev, nationalId: value }));
       }
-      return; // Stop further execution for nationalId field
+      return;
     }
 
     if (name === "mobile") {
       if (/^\d*$/.test(value) && value.length <= 10) {
         setFormData((prev) => ({ ...prev, mobile: value }));
       }
-      return; // Stop further execution for mobile field
+      return;
     }
 
     setFormData({
@@ -79,7 +82,6 @@ const Employee = () => {
     });
   };
 
-  // Handle form submission to add a new employee
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch("http://localhost:8080/api/employees/add", {
@@ -92,7 +94,6 @@ const Employee = () => {
       .then((response) => response.json())
       .then((data) => {
         setEmployeeDataList((prevList) => [...prevList, data]);
-        // Reset the form after submission
         setFormData({
           firstName: "",
           middleName: "",
@@ -100,37 +101,44 @@ const Employee = () => {
           nationalId: "",
           mobile: "",
         });
-        setShowSuccessModal(true); // Show success modal
-        autoCloseModal(setShowSuccessModal); // Auto-close after 2.5 seconds
+        setShowSuccessModal(true);
+        autoCloseModal(setShowSuccessModal);
       })
       .catch((error) => {
         console.error("Error adding employee:", error);
-        setShowErrorModal(true); // Show error modal
-        autoCloseModal(setShowErrorModal); // Auto-close after 2.5 seconds
+        setShowErrorModal(true);
+        autoCloseModal(setShowErrorModal);
       });
   };
 
-  // Fetch all employees from the backend
   const fetchEmployees = () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     fetch("http://localhost:8080/api/employees/all")
       .then((response) => response.json())
       .then((data) => {
         setEmployeeDataList(data);
-        setLoading(false); // Stop loading
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching employees:", error);
-        setLoading(false); // Stop loading on error
+        setLoading(false);
       });
   };
 
-  // Effect to fetch employees when "Employees" tab is active
   useEffect(() => {
     if (activeTab === "employees") {
       fetchEmployees();
     }
   }, [activeTab]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEmployees = employeeDataList.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const totalPages = Math.ceil(employeeDataList.length / itemsPerPage);
 
   return (
     <>
@@ -139,8 +147,8 @@ const Employee = () => {
         visible={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
       >
-        <CModalHeader>Success</CModalHeader>
-        <CModalBody className="text-center">
+        <CModalHeader style={{ color: blueColor }}>Success</CModalHeader>
+        <CModalBody className="text-center" style={{ color: blueColor }}>
           <img src={successSvg} alt="Success" style={{ width: "150px" }} />
           <p>Employee successfully added!</p>
         </CModalBody>
@@ -148,8 +156,8 @@ const Employee = () => {
 
       {/* Error Modal */}
       <CModal visible={showErrorModal} onClose={() => setShowErrorModal(false)}>
-        <CModalHeader>Error</CModalHeader>
-        <CModalBody className="text-center">
+        <CModalHeader style={{ color: blueColor }}>Error</CModalHeader>
+        <CModalBody className="text-center" style={{ color: blueColor }}>
           <img src={errorPng} alt="Error" style={{ width: "150px" }} />
           <p>Failed to add employee. Please try again.</p>
         </CModalBody>
@@ -190,18 +198,24 @@ const Employee = () => {
               }}
             >
               <CCardHeader style={{ backgroundColor: "#fff" }}>
-                <h3 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+                <h3
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: blueColor,
+                  }}
+                >
                   Employee Registration
                 </h3>
               </CCardHeader>
-              <CCardBody>
+              <CCardBody style={{ color: blueColor }}>
                 <CForm onSubmit={handleSubmit}>
                   {/* Form Fields */}
                   <CRow className="mb-3">
                     <CCol md="6">
                       <CFormLabel
                         htmlFor="firstName"
-                        style={{ fontWeight: "bold" }}
+                        style={{ fontWeight: "bold", color: blueColor }}
                       >
                         First Name
                       </CFormLabel>
@@ -217,7 +231,7 @@ const Employee = () => {
                     <CCol md="6">
                       <CFormLabel
                         htmlFor="middleName"
-                        style={{ fontWeight: "bold" }}
+                        style={{ fontWeight: "bold", color: blueColor }}
                       >
                         Middle Name
                       </CFormLabel>
@@ -234,7 +248,7 @@ const Employee = () => {
                     <CCol md="6">
                       <CFormLabel
                         htmlFor="lastName"
-                        style={{ fontWeight: "bold" }}
+                        style={{ fontWeight: "bold", color: blueColor }}
                       >
                         Surname
                       </CFormLabel>
@@ -250,7 +264,7 @@ const Employee = () => {
                     <CCol md="6">
                       <CFormLabel
                         htmlFor="nationalId"
-                        style={{ fontWeight: "bold" }}
+                        style={{ fontWeight: "bold", color: blueColor }}
                       >
                         National ID
                       </CFormLabel>
@@ -268,7 +282,7 @@ const Employee = () => {
                     <CCol md="6">
                       <CFormLabel
                         htmlFor="mobile"
-                        style={{ fontWeight: "bold" }}
+                        style={{ fontWeight: "bold", color: blueColor }}
                       >
                         Mobile Number
                       </CFormLabel>
@@ -293,47 +307,99 @@ const Employee = () => {
           {activeTab === "employees" && (
             <CCard className="mb-4">
               <CCardHeader>
-                <h3 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+                <h3
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: blueColor,
+                  }}
+                >
                   Employee Details
                 </h3>
               </CCardHeader>
               <CCardBody>
                 {loading ? (
                   <div className="text-center">
-                    {/* Zoomies loader */}
                     <l-zoomies
                       size="80"
                       stroke="5"
                       bg-opacity="0.1"
                       speed="1.2"
-                      color="darkgreen"
+                      color="blue"
                     ></l-zoomies>
                   </div>
                 ) : (
-                  <CTable striped hover responsive>
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>#</CTableHeaderCell>
-                        <CTableHeaderCell>First Name</CTableHeaderCell>
-                        <CTableHeaderCell>Middle Name</CTableHeaderCell>
-                        <CTableHeaderCell>Surname</CTableHeaderCell>
-                        <CTableHeaderCell>National ID</CTableHeaderCell>
-                        <CTableHeaderCell>Mobile Number</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {employeeDataList.map((employee, index) => (
-                        <CTableRow key={employee.id}>
-                          <CTableDataCell>{index + 1}</CTableDataCell>
-                          <CTableDataCell>{employee.firstName}</CTableDataCell>
-                          <CTableDataCell>{employee.middleName}</CTableDataCell>
-                          <CTableDataCell>{employee.lastName}</CTableDataCell>
-                          <CTableDataCell>{employee.nationalId}</CTableDataCell>
-                          <CTableDataCell>{employee.mobile}</CTableDataCell>
+                  <>
+                    <CTable striped hover responsive>
+                      <CTableHead>
+                        <CTableRow>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            #
+                          </CTableHeaderCell>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            First Name
+                          </CTableHeaderCell>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            Middle Name
+                          </CTableHeaderCell>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            Surname
+                          </CTableHeaderCell>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            National ID
+                          </CTableHeaderCell>
+                          <CTableHeaderCell style={{ color: blueColor }}>
+                            Mobile Number
+                          </CTableHeaderCell>
                         </CTableRow>
-                      ))}
-                    </CTableBody>
-                  </CTable>
+                      </CTableHead>
+                      <CTableBody>
+                        {currentEmployees.map((employee, index) => (
+                          <CTableRow key={employee.id}>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {indexOfFirstItem + index + 1}
+                            </CTableDataCell>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {employee.firstName}
+                            </CTableDataCell>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {employee.middleName}
+                            </CTableDataCell>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {employee.lastName}
+                            </CTableDataCell>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {employee.nationalId}
+                            </CTableDataCell>
+                            <CTableDataCell style={{ color: "black" }}>
+                              {employee.mobile}
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))}
+                      </CTableBody>
+                    </CTable>
+
+                    {/* Pagination Controls */}
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <CButton
+                        color="dark"
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </CButton>
+                      <span>
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <CButton
+                        color="dark"
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </CButton>
+                    </div>
+                  </>
                 )}
               </CCardBody>
             </CCard>

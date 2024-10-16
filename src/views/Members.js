@@ -34,7 +34,7 @@ const Members = () => {
   const [selectedMember, setSelectedMember] = useState({});
   const [cardNumber, setCardNumber] = useState(""); // State for card number
   const [cardSerialNumber, setCardSerialNumber] = useState(""); // State for card serial number
-  const [searchFirstName, setSearchFirstName] = useState("");
+  const [searchZpNo, setSearchZpNo] = useState(""); // State for ZP number search
   const [searchMobile, setSearchMobile] = useState("");
   const [activeTab, setActiveTab] = useState("all"); // 'all', 'receiving', 'nonReceiving'
   const [members, setMembers] = useState([]); // State to store members
@@ -67,9 +67,7 @@ const Members = () => {
   const paginatedMembers = members
     .filter(
       (member) =>
-        member.firstName
-          .toLowerCase()
-          .includes(searchFirstName.toLowerCase()) &&
+        member.zpNo.toLowerCase().includes(searchZpNo.toLowerCase()) && // Search by ZP Number
         member.mobile.toLowerCase().includes(searchMobile.toLowerCase())
     )
     .slice((currentPage - 1) * membersPerPage, currentPage * membersPerPage);
@@ -107,27 +105,29 @@ const Members = () => {
         </CNav>
 
         {/* Search Inputs */}
-        <CInputGroup className="mb-3 mt-3">
-          <CInputGroupText>
-            <FiSearch />
-          </CInputGroupText>
-          <CFormInput
-            placeholder="Search by First Name"
-            value={searchFirstName}
-            onChange={(e) => setSearchFirstName(e.target.value)}
-          />
-        </CInputGroup>
+        <div className="mb-3 mt-3" style={{ maxWidth: "300px" }}>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>
+              <FiSearch />
+            </CInputGroupText>
+            <CFormInput
+              placeholder="Search by ZP Number"
+              value={searchZpNo}
+              onChange={(e) => setSearchZpNo(e.target.value)}
+            />
+          </CInputGroup>
 
-        <CInputGroup className="mb-3">
-          <CInputGroupText>
-            <FiSearch />
-          </CInputGroupText>
-          <CFormInput
-            placeholder="Search by Mobile Number"
-            value={searchMobile}
-            onChange={(e) => setSearchMobile(e.target.value)}
-          />
-        </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>
+              <FiSearch />
+            </CInputGroupText>
+            <CFormInput
+              placeholder="Search by Mobile Number"
+              value={searchMobile}
+              onChange={(e) => setSearchMobile(e.target.value)}
+            />
+          </CInputGroup>
+        </div>
 
         {/* Loading Indicator */}
         {loading ? (
@@ -137,7 +137,7 @@ const Members = () => {
               stroke="5"
               bg-opacity="0.1"
               speed="1.4"
-              color="black"
+              color="blue"
             ></l-zoomies>
             <p>Loading members...</p>
           </div>
@@ -146,15 +146,30 @@ const Members = () => {
             <CTable striped>
               <CTableHead>
                 <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Surname</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">ZP Number</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">National ID</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Phone Number</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    #
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    First Name
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    Surname
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    ZP Number
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    National ID
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    Phone Number
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ color: "blue" }}>
+                    Action
+                  </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
+
               <CTableBody>
                 {paginatedMembers.map((member, index) => (
                   <CTableRow key={member.id}>

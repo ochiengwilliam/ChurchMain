@@ -37,6 +37,7 @@ const AppSidebar = () => {
       position="fixed"
       unfoldable={unfoldable}
       visible={sidebarShow}
+      //narrow
       onVisibleChange={(visible) => {
         dispatch({ type: "set", sidebarShow: visible });
       }}

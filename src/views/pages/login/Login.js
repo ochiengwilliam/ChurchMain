@@ -85,7 +85,7 @@ const Login = () => {
 
                   <CCol style={{ marginTop: "20px" }}>
                     <CRow xs={9}>
-                      <Link to="/RegularMembers">
+                      <Link to="/Dashboard">
                         <CButton
                           color="primary"
                           className="px-4"
