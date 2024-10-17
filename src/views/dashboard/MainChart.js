@@ -8,6 +8,9 @@ import {
   ArcElement,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { dotWave } from "ldrs"; // Import dotWave for loading animation
+
+dotWave.register(); // Register loading effect
 
 ChartJS.register(
   BarElement,
@@ -153,7 +156,13 @@ const MainChart = () => {
     },
   };
 
-  if (loading) return <p>Loading charts...</p>;
+  if (loading) {
+    return (
+      <div className="text-center" style={{ padding: "50px" }}>
+        <l-dot-wave size="47" speed="1" color="blue" />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>

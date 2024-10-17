@@ -31,7 +31,9 @@ import "ldrs/zoomies"; // Import the zoomies loader
 
 const Members = () => {
   const [visible, setVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false); // For editing modal
   const [selectedMember, setSelectedMember] = useState({});
+  const [editMember, setEditMember] = useState({}); // For member being edited
   const [cardNumber, setCardNumber] = useState(""); // State for card number
   const [cardSerialNumber, setCardSerialNumber] = useState(""); // State for card serial number
   const [searchZpNo, setSearchZpNo] = useState(""); // State for ZP number search
@@ -60,6 +62,31 @@ const Members = () => {
     fetchMembers();
   }, []);
 
+  // Handle member deletion
+  const handleDeleteMember = async (memberId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/registration/${memberId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        // Remove the deleted member from the state
+        setMembers((prevMembers) =>
+          prevMembers.filter((member) => member.id !== memberId)
+        );
+        alert("Member deleted successfully.");
+      } else {
+        alert("Failed to delete the member.");
+      }
+    } catch (error) {
+      console.error("Error deleting member:", error);
+      alert("An error occurred while deleting the member.");
+    }
+  };
+
   // Calculate the number of pages
   const totalPages = Math.ceil(members.length / membersPerPage);
 
@@ -75,6 +102,44 @@ const Members = () => {
   const handleAssignCardClick = (member) => {
     setSelectedMember(member);
     setVisible(true);
+  };
+
+  // Handle the "Edit" click
+  const handleEditClick = (member) => {
+    setEditMember(member); // Set the member to be edited
+    setEditVisible(true); // Show the edit modal
+  };
+
+  // Handle saving the edited member
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/registration/${editMember.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editMember),
+        }
+      );
+
+      if (response.ok) {
+        const updatedMember = await response.json();
+        setMembers((prevMembers) =>
+          prevMembers.map((member) =>
+            member.id === updatedMember.id ? updatedMember : member
+          )
+        );
+        alert("Member updated successfully.");
+        setEditVisible(false); // Close modal on success
+      } else {
+        alert("Failed to update the member.");
+      }
+    } catch (error) {
+      console.error("Error updating member:", error);
+      alert("An error occurred while updating the member.");
+    }
   };
 
   const handleTabClick = (tab) => {
@@ -191,11 +256,28 @@ const Members = () => {
                         </CDropdownToggle>
                         <CDropdownMenu>
                           <CDropdownItem
+                            style={{ cursor: "pointer", fontWeight: "bold" }}
                             onClick={() => handleAssignCardClick(member)}
                           >
                             Assign Card
                           </CDropdownItem>
-                          <CDropdownItem>Delete</CDropdownItem>
+                          <CDropdownItem
+                            style={{ cursor: "pointer", fontWeight: "bold" }}
+                            onClick={() => handleEditClick(member)}
+                          >
+                            Edit
+                          </CDropdownItem>
+                          <CDropdownItem
+                            style={{
+                              cursor: "pointer",
+                              color: "red",
+                              fontWeight: "bold",
+                            }}
+                            pointer
+                            onClick={() => handleDeleteMember(member.id)}
+                          >
+                            Delete
+                          </CDropdownItem>
                         </CDropdownMenu>
                       </CDropdown>
                     </CTableDataCell>
@@ -204,28 +286,26 @@ const Members = () => {
               </CTableBody>
             </CTable>
 
-            {/* Pagination Controls */}
-            <CPagination className="mt-3">
+            {/* Pagination */}
+            <CPagination align="center" aria-label="Page navigation example">
               <CPaginationItem
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
               >
                 Previous
               </CPaginationItem>
-              {Array.from({ length: totalPages }, (_, index) => (
+              {Array.from({ length: totalPages }).map((_, index) => (
                 <CPaginationItem
-                  key={index + 1}
-                  active={index + 1 === currentPage}
+                  key={index}
+                  active={currentPage === index + 1}
                   onClick={() => setCurrentPage(index + 1)}
                 >
                   {index + 1}
                 </CPaginationItem>
               ))}
               <CPaginationItem
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
                 disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
               >
                 Next
               </CPaginationItem>
@@ -234,30 +314,28 @@ const Members = () => {
         )}
       </CCard>
 
-      {/* Modal for assigning card */}
-      <CModal visible={visible} onClose={() => setVisible(false)}>
-        <CModalHeader onClose={() => setVisible(false)}>
+      {/* Modal for Assigning Card */}
+      <CModal
+        alignment="center"
+        visible={visible}
+        onClose={() => setVisible(false)}
+      >
+        <CModalHeader>
           <CModalTitle>Assign Card</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <p>
-            <strong>First Name:</strong> {selectedMember.firstName}
-          </p>
-          <p>
-            <strong>Surname:</strong> {selectedMember.surname || "-"}
-          </p>
-          <p>
-            <strong>Mobile Number:</strong> {selectedMember.mobile}
-          </p>
-          <p>
-            <strong>Email:</strong> {selectedMember.email}
-          </p>
-
-          {/* New input fields for card number and serial number */}
+          <div>
+            <h6>
+              Assign card for:{" "}
+              <span style={{ color: "blue" }}>
+                {selectedMember.firstName} {selectedMember.surname}
+              </span>
+            </h6>
+          </div>
           <CInputGroup className="mb-3">
             <CInputGroupText>Card Number</CInputGroupText>
             <CFormInput
-              placeholder="Enter Card Number"
+              placeholder="Enter card number"
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
             />
@@ -266,7 +344,7 @@ const Members = () => {
           <CInputGroup className="mb-3">
             <CInputGroupText>Card Serial Number</CInputGroupText>
             <CFormInput
-              placeholder="Enter Card Serial Number"
+              placeholder="Enter card serial number"
               value={cardSerialNumber}
               onChange={(e) => setCardSerialNumber(e.target.value)}
             />
@@ -276,8 +354,81 @@ const Members = () => {
           <CButton color="secondary" onClick={() => setVisible(false)}>
             Cancel
           </CButton>
-          <CButton color="primary" onClick={() => setVisible(false)}>
-            Assign Card
+          <CButton color="primary">Assign</CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal for Editing Member */}
+      <CModal
+        alignment="center"
+        visible={editVisible}
+        onClose={() => setEditVisible(false)}
+      >
+        <CModalHeader>
+          <CModalTitle>Edit Member</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>First Name</CInputGroupText>
+            <CFormInput
+              value={editMember.firstName}
+              onChange={(e) =>
+                setEditMember({ ...editMember, firstName: e.target.value })
+              }
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>Middle Name</CInputGroupText>
+            <CFormInput
+              value={editMember.middleName || ""}
+              onChange={(e) =>
+                setEditMember({ ...editMember, middleName: e.target.value })
+              }
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>Surname</CInputGroupText>
+            <CFormInput
+              value={editMember.surname}
+              onChange={(e) =>
+                setEditMember({ ...editMember, surname: e.target.value })
+              }
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>National ID</CInputGroupText>
+            <CFormInput
+              value={editMember.nationalId}
+              onChange={(e) =>
+                setEditMember({ ...editMember, nationalId: e.target.value })
+              }
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>Mobile Number</CInputGroupText>
+            <CFormInput
+              value={editMember.mobile}
+              onChange={(e) =>
+                setEditMember({ ...editMember, mobile: e.target.value })
+              }
+            />
+          </CInputGroup>
+          <CInputGroup className="mb-3">
+            <CInputGroupText>ZP Number</CInputGroupText>
+            <CFormInput
+              value={editMember.zpNo}
+              onChange={(e) =>
+                setEditMember({ ...editMember, zpNo: e.target.value })
+              }
+            />
+          </CInputGroup>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setEditVisible(false)}>
+            Cancel
+          </CButton>
+          <CButton color="primary" onClick={handleSaveEdit}>
+            Save Changes
           </CButton>
         </CModalFooter>
       </CModal>

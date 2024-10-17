@@ -23,7 +23,8 @@ import {
   CNavItem,
   CNavLink,
 } from "@coreui/react";
-import "ldrs/zoomies"; // Import the zoomies loader
+import { zoomies } from "ldrs"; // Import the zoomies loader
+zoomies.register(); // Register the zoomies loader
 
 const Visitors = () => {
   const [activeTab, setActiveTab] = useState("registration");
@@ -42,38 +43,32 @@ const Visitors = () => {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
 
-  // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (["firstName", "middleName", "surname"].includes(name)) {
       if (/^[A-Za-z]*$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
-      return; // Exit if it's one of the name fields (prevents further logic below)
+      return;
     }
-
     if (name === "nationalId") {
       if (/^\d*$/.test(value) && value.length <= 8) {
         setFormData((prev) => ({ ...prev, nationalId: value }));
       }
-      return; // Stop further execution for nationalId field
+      return;
     }
-
     if (name === "mobile") {
       if (/^\d*$/.test(value) && value.length <= 10) {
         setFormData((prev) => ({ ...prev, mobile: value }));
       }
-      return; // Stop further execution for mobile field
+      return;
     }
-
     setFormData({
       ...formData,
       [name]: value,
     });
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch("http://localhost:8080/api/visitors", {
@@ -115,7 +110,7 @@ const Visitors = () => {
       .then((response) => response.json())
       .then((data) => {
         setVisitorDataList(data);
-        setLoading(false); // Stop loading
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching visitors:", error);
@@ -131,30 +126,31 @@ const Visitors = () => {
 
   return (
     <>
-      {/* Tabs Navigation */}
-      <CNav variant="tabs">
-        <CNavItem>
-          <CNavLink
-            href="#"
-            active={activeTab === "registration"}
-            onClick={() => setActiveTab("registration")}
-          >
-            Visitor Registration
-          </CNavLink>
-        </CNavItem>
-        <CNavItem>
-          <CNavLink
-            href="#"
-            active={activeTab === "visitors"}
-            onClick={() => setActiveTab("visitors")}
-          >
-            Visitors
-          </CNavLink>
-        </CNavItem>
-      </CNav>
-
       <CRow className="justify-content-md-center">
         <CCol xs={10}>
+          <CNav variant="tabs" style={{ marginBottom: "20px" }}>
+            <CNavItem>
+              <CNavLink
+                href="#"
+                active={activeTab === "registration"}
+                onClick={() => setActiveTab("registration")}
+                style={{ fontWeight: "bold" }}
+              >
+                Visitor Registration
+              </CNavLink>
+            </CNavItem>
+            <CNavItem>
+              <CNavLink
+                href="#"
+                active={activeTab === "visitors"}
+                onClick={() => setActiveTab("visitors")}
+                style={{ fontWeight: "bold" }}
+              >
+                Available Visitors
+              </CNavLink>
+            </CNavItem>
+          </CNav>
+
           {activeTab === "registration" && (
             <CCard
               className="mb-4"
@@ -162,6 +158,7 @@ const Visitors = () => {
                 boxShadow: "0px 15px 34px 0px rgba(0,0,0,0.2)",
                 color: "blue",
                 padding: "40px",
+                marginTop: "20px",
               }}
             >
               <CCardHeader style={{ backgroundColor: "#fff" }}>
@@ -169,7 +166,6 @@ const Visitors = () => {
               </CCardHeader>
               <CCardBody>
                 <CForm onSubmit={handleSubmit}>
-                  {/* Form Fields */}
                   <CRow className="mb-3">
                     <CCol md="6">
                       <CFormLabel
@@ -292,9 +288,8 @@ const Visitors = () => {
                       </select>
                     </CCol>
                   </CRow>
-
                   <CButton type="submit" color="primary">
-                    Register Visitor
+                    Submit
                   </CButton>
                 </CForm>
               </CCardBody>
@@ -302,40 +297,69 @@ const Visitors = () => {
           )}
 
           {activeTab === "visitors" && (
-            <CCard className="mb-4">
-              <CCardHeader>
-                <h3>Visitor Details</h3>
+            <CCard
+              className="mb-4"
+              style={{
+                boxShadow: "0px 15px 34px 0px rgba(0,0,0,0.2)",
+                padding: "20px",
+                marginTop: "20px",
+              }}
+            >
+              <CCardHeader style={{ backgroundColor: "#fff" }}>
+                <h3>Visitors</h3>
               </CCardHeader>
               <CCardBody>
                 {loading ? (
-                  <div className="text-center">
-                    {/* Replace CSpinner with zoomies loader */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "200px",
+                    }}
+                  >
                     <l-zoomies
                       size="80"
                       stroke="5"
                       bg-opacity="0.1"
-                      speed="1.2"
+                      speed="1.4"
                       color="blue"
                     ></l-zoomies>
                   </div>
                 ) : (
-                  <CTable striped hover responsive>
+                  <CTable responsive striped bordered>
                     <CTableHead>
                       <CTableRow>
-                        <CTableHeaderCell>First Name</CTableHeaderCell>
-                        <CTableHeaderCell>Middle Name</CTableHeaderCell>
-                        <CTableHeaderCell>Surname</CTableHeaderCell>
-                        <CTableHeaderCell>National ID</CTableHeaderCell>
-                        <CTableHeaderCell>Mobile</CTableHeaderCell>
-                        <CTableHeaderCell>Address</CTableHeaderCell>
-                        <CTableHeaderCell>Gender</CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          No.
+                        </CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          First Name
+                        </CTableHeaderCell>
+
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          Surname
+                        </CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          National ID
+                        </CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          Mobile Number
+                        </CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          Address
+                        </CTableHeaderCell>
+                        <CTableHeaderCell style={{ color: "blue" }}>
+                          Gender
+                        </CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                      {visitorDataList.map((visitor) => (
-                        <CTableRow key={visitor.id}>
+                      {visitorDataList.map((visitor, index) => (
+                        <CTableRow key={visitor.nationalId}>
+                          <CTableDataCell>{index + 1}</CTableDataCell>
                           <CTableDataCell>{visitor.firstName}</CTableDataCell>
-                          <CTableDataCell>{visitor.middleName}</CTableDataCell>
+
                           <CTableDataCell>{visitor.surname}</CTableDataCell>
                           <CTableDataCell>{visitor.nationalId}</CTableDataCell>
                           <CTableDataCell>{visitor.mobile}</CTableDataCell>
@@ -352,11 +376,8 @@ const Visitors = () => {
         </CCol>
       </CRow>
 
-      {/* Modal */}
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
-        <CModalHeader onClose={() => setShowModal(false)}>
-          {isError ? "Error" : "Success"}
-        </CModalHeader>
+        <CModalHeader>{isError ? "Error" : "Success"}</CModalHeader>
         <CModalBody>{modalMessage}</CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setShowModal(false)}>

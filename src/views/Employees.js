@@ -334,7 +334,7 @@ const Employee = () => {
                       <CTableHead>
                         <CTableRow>
                           <CTableHeaderCell style={{ color: blueColor }}>
-                            #
+                            No.
                           </CTableHeaderCell>
                           <CTableHeaderCell style={{ color: blueColor }}>
                             First Name
