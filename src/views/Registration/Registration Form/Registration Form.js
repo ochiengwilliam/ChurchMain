@@ -12,9 +12,10 @@ import {
   CModal,
   CModalHeader,
   CModalBody,
-  CModalFooter,
 } from "@coreui/react";
 import { useEffect, useState } from "react";
+import successSvg from "src/assets/images/avatars/13.svg";
+import errorPng from "src/assets/images/avatars/14.png";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +26,6 @@ const RegistrationForm = () => {
     district: "",
     zpNo: "",
     maritalStatus: "",
-    spouseName: "",
     spouseZpNo: "",
     nationalId: "",
     mobile: "",
@@ -39,9 +39,9 @@ const RegistrationForm = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSpouseZpNoDisabled, setIsSpouseZpNoDisabled] = useState(true);
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
-    // Fetch districts from the API
     const fetchDistricts = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/districts");
@@ -58,15 +58,13 @@ const RegistrationForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Allow only alphabetic input for firstName, middleName, and surname
     if (["firstName", "middleName", "surname"].includes(name)) {
       if (/^[A-Za-z]*$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
-      return; // Exit if it's one of the name fields (prevents further logic below)
+      return;
     }
 
-    // Validation for National ID (must be numeric and exactly 8 digits)
     if (name === "nationalId") {
       if (/^\d*$/.test(value) && value.length <= 8) {
         setFormData((prev) => ({ ...prev, nationalId: value }));
@@ -80,7 +78,6 @@ const RegistrationForm = () => {
       return;
     }
 
-    // Validation for Mobile Number (must be numeric and exactly 10 digits)
     if (name === "mobile") {
       if (/^\d*$/.test(value) && value.length <= 10) {
         setFormData((prev) => ({ ...prev, mobile: value }));
@@ -134,21 +131,32 @@ const RegistrationForm = () => {
         district: "",
         zpNo: "",
         maritalStatus: "",
-        spouseName: "",
         spouseZpNo: "",
         nationalId: "",
         mobile: "",
       });
 
-      setModalMessage("Registration was successful!"); // Success message
-      setIsError(false); // Set modal style to success
+      setModalMessage("Registration was successful!");
+      setIsError(false);
       setShowModal(true);
+
+      setShowMessage(true);
+
+      setTimeout(() => {
+        setShowModal(false);
+      }, 1500);
     } catch (error) {
       console.error("Error submitting data:", error);
 
-      setModalMessage("There was an error registering. Please try again."); // Error message
-      setIsError(true); // Set modal style to error
+      setModalMessage("There was an error registering. Please try again.");
+      setIsError(true);
       setShowModal(true);
+
+      setShowMessage(true);
+
+      setTimeout(() => {
+        setShowModal(false);
+      }, 1500);
     }
   };
 
@@ -169,7 +177,6 @@ const RegistrationForm = () => {
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
-                {/* Personal Information */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -239,7 +246,6 @@ const RegistrationForm = () => {
                   </CCol>
                 </CRow>
 
-                {/* District and ZP Number */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -281,7 +287,6 @@ const RegistrationForm = () => {
                   </CCol>
                 </CRow>
 
-                {/* Marital Status and Spouse ZP Number */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -297,10 +302,11 @@ const RegistrationForm = () => {
                       onChange={handleMaritalStatusChange}
                       required
                     >
-                      <option value="">Select</option>
+                      <option value="">Select status</option>
+                      <option value="Single">Single</option>
                       <option value="Married">Married</option>
                       <option value="Divorced">Divorced</option>
-                      <option value="Single">Single</option>
+                      <option value="Widowed">Widowed</option>
                     </CFormSelect>
                   </CCol>
                   <CCol md="6">
@@ -315,13 +321,12 @@ const RegistrationForm = () => {
                       name="spouseZpNo"
                       value={formData.spouseZpNo}
                       onChange={handleChange}
-                      placeholder="Enter Spouse ZP number"
+                      placeholder="Enter spouse ZP number"
                       disabled={isSpouseZpNoDisabled}
                     />
                   </CCol>
                 </CRow>
 
-                {/* National ID and Mobile */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -336,11 +341,9 @@ const RegistrationForm = () => {
                       value={formData.nationalId}
                       onChange={handleChange}
                       placeholder="Enter national ID"
+                      maxLength="8"
                       required
                     />
-                    {errors.nationalId && (
-                      <span style={{ color: "red" }}>{errors.nationalId}</span>
-                    )}
                   </CCol>
                   <CCol md="6">
                     <CFormLabel
@@ -355,16 +358,14 @@ const RegistrationForm = () => {
                       value={formData.mobile}
                       onChange={handleChange}
                       placeholder="Enter mobile number"
+                      maxLength="10"
                       required
                     />
-                    {errors.mobile && (
-                      <span style={{ color: "red" }}>{errors.mobile}</span>
-                    )}
                   </CCol>
                 </CRow>
 
                 <CButton color="primary" type="submit">
-                  Submit
+                  Register
                 </CButton>
               </CForm>
             </CCardBody>
@@ -372,19 +373,21 @@ const RegistrationForm = () => {
         </CCol>
       </CRow>
 
-      {/* Modal */}
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
         <CModalHeader>
           <h5>{isError ? "Error" : "Success"}</h5>
         </CModalHeader>
-        <CModalBody>
-          <p>{modalMessage}</p>
+        <CModalBody style={{ textAlign: "center" }}>
+          <img
+            src={isError ? errorPng : successSvg}
+            alt={isError ? "Error icon" : "Success icon"}
+            style={{
+              width: "100px",
+              marginBottom: "20px",
+            }}
+          />
+          {showMessage && <p>{modalMessage}</p>}
         </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </CButton>
-        </CModalFooter>
       </CModal>
     </>
   );

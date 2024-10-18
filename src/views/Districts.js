@@ -18,8 +18,13 @@ import {
   CNav,
   CNavItem,
   CNavLink,
+  CModal,
+  CModalHeader,
+  CModalBody,
 } from "@coreui/react";
 import { zoomies } from "ldrs";
+import successSvg from "src/assets/images/avatars/13.svg"; // Success image
+import errorPng from "src/assets/images/avatars/14.png"; // Error image
 
 // Register the zoomies loader
 zoomies.register();
@@ -32,15 +37,15 @@ function DistrictForm() {
     createdBy: "",
   });
   const [districtsDataList, setDistrictsDataList] = useState([]);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,19 +62,25 @@ function DistrictForm() {
         const newDistrict = await response.json();
         setDistrictsDataList((prevList) => [...prevList, newDistrict]);
         setFormData({ districtName: "", elderZP: "", createdBy: "" });
+
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 1500);
       } else {
         console.error("Failed to add district.");
+        setShowErrorModal(true);
+        setTimeout(() => setShowErrorModal(false), 1500);
       }
     } catch (error) {
       console.error("Error posting district data:", error);
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 2500);
     }
   };
 
-  // Fetch districts data when "details" tab is active
   useEffect(() => {
     if (activeTab === "details") {
       const fetchDistrictsData = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         try {
           const response = await fetch("http://localhost:8080/api/districts");
           if (response.ok) {
@@ -81,7 +92,7 @@ function DistrictForm() {
         } catch (error) {
           console.error("Error fetching districts data:", error);
         } finally {
-          setLoading(false); // Stop loading
+          setLoading(false);
         }
       };
 
@@ -115,7 +126,6 @@ function DistrictForm() {
         </CNavItem>
       </CNav>
 
-      {/* Conditional rendering based on active tab */}
       {activeTab === "registration" && (
         <CCard
           className="mb-4"
@@ -206,8 +216,8 @@ function DistrictForm() {
             {loading ? (
               <div style={{ textAlign: "center" }}>
                 <l-zoomies
-                  size="80"
-                  stroke="5"
+                  size="120"
+                  stroke=""
                   bg-opacity="0.1"
                   speed="1.4"
                   color="blue"
@@ -242,6 +252,40 @@ function DistrictForm() {
           </CCardBody>
         </CCard>
       )}
+
+      {/* Success Modal */}
+      <CModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        centered
+      >
+        <CModalHeader>
+          <h5>Success</h5>
+        </CModalHeader>
+        <CModalBody className="text-center">
+          <img src={successSvg} alt="Success" style={{ width: "150px" }} />
+          <p className="mt-3" style={{ color: "green" }}>
+            District added successfully.
+          </p>
+        </CModalBody>
+      </CModal>
+
+      {/* Error Modal */}
+      <CModal
+        visible={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        centered
+      >
+        <CModalHeader>
+          <h5>Error</h5>
+        </CModalHeader>
+        <CModalBody className="text-center">
+          <img src={errorPng} alt="Error" style={{ width: "150px" }} />
+          <p className="mt-3" style={{ color: "red" }}>
+            Failed to add district. Please try again.
+          </p>
+        </CModalBody>
+      </CModal>
     </>
   );
 }

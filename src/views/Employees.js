@@ -44,7 +44,6 @@ const Employee = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  // Assuming button color is #007bff (Bootstrap's primary)
   const blueColor = "#007bff";
 
   const autoCloseModal = (setShowModal) => {
@@ -321,7 +320,7 @@ const Employee = () => {
                 {loading ? (
                   <div className="text-center">
                     <l-zoomies
-                      size="80"
+                      size="120"
                       stroke="5"
                       bg-opacity="0.1"
                       speed="1.2"

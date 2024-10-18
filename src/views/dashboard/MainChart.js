@@ -159,7 +159,7 @@ const MainChart = () => {
   if (loading) {
     return (
       <div className="text-center" style={{ padding: "50px" }}>
-        <l-dot-wave size="47" speed="1" color="blue" />
+        <l-dot-wave size="100" speed="1" color="blue" />
       </div>
     );
   }

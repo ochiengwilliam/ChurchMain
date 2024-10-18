@@ -198,7 +198,7 @@ const Members = () => {
         {loading ? (
           <div className="text-center">
             <l-zoomies
-              size="80"
+              size="120"
               stroke="5"
               bg-opacity="0.1"
               speed="1.4"

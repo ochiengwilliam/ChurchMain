@@ -24,11 +24,11 @@ import {
 } from "@coreui/react";
 import successSvg from "src/assets/images/avatars/13.svg";
 import errorPng from "src/assets/images/avatars/14.png";
-import { dotWave } from "ldrs"; // Import dotWave for loading animation
-import { zoomies } from "ldrs"; // Import zoomies loader
+import { dotWave } from "ldrs";
+import { zoomies } from "ldrs";
 
-dotWave.register(); // Register dotWave loading effect
-zoomies.register(); // Register zoomies loading effect
+dotWave.register();
+zoomies.register();
 
 function ElderForm() {
   const [formData, setFormData] = useState({
@@ -40,20 +40,18 @@ function ElderForm() {
   });
 
   const [elderDataList, setElderDataList] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
-  const [showErrorModal, setShowErrorModal] = useState(false); // Error modal state
-  const [nameError, setNameError] = useState(""); // Error state for Full Name
-  const [activeTab, setActiveTab] = useState("registration"); // State for tab switching
+  const [loading, setLoading] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [activeTab, setActiveTab] = useState("registration");
 
-  // Auto-close modal after 2.5 seconds
   const autoCloseModal = (setShowModal) => {
     setTimeout(() => {
       setShowModal(false);
-    }, 2500); // 2.5 seconds
+    }, 1500);
   };
 
-  // Fetch elder data from the backend on mount
   useEffect(() => {
     if (activeTab === "details") {
       const fetchElderData = async () => {
@@ -62,74 +60,64 @@ function ElderForm() {
           const response = await fetch("http://localhost:8080/api/elders");
           const data = await response.json();
 
-          setElderDataList(data); // Update state with fetched data
+          setElderDataList(data);
         } catch (error) {
           console.error("Error fetching elder data:", error);
         } finally {
-          setLoading(false); // Stop loading after data fetch
+          setLoading(false);
         }
       };
 
       fetchElderData();
     }
-  }, [activeTab]); // Fetch data when switching to "details" tab
-
-  // Validate Full Name to only allow alphabets and spaces
+  }, [activeTab]);
   const validateName = (name) => {
     const nameRegex = /^[a-zA-Z\s]+$/; // Only alphabets and spaces
     if (!nameRegex.test(name)) {
       setNameError("Input valid name.");
       return false;
     }
-    setNameError(""); // Clear error if valid
+    setNameError("");
     return true;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // If the name field is being updated, validate it, but allow empty values
     if (name === "name") {
       if (value === "" || validateName(value)) {
         setFormData({ ...formData, [name]: value });
-        return; // Stop further processing if name is valid or empty
+        return;
       } else {
-        return; // Stop if the input is invalid
+        return;
       }
     }
 
-    // Update form data for all fields
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate the full name before submission
     if (!validateName(formData.name)) {
-      return; // Prevent submission if validation fails
+      return;
     }
 
     try {
-      // Add createdAt field with current timestamp
       const elderData = { ...formData, createdAt: new Date().toISOString() };
 
-      // Send POST request to backend
       const response = await fetch("http://localhost:8080/api/elders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(elderData), // Send form data as JSON
+        body: JSON.stringify(elderData),
       });
 
       if (response.ok) {
-        // If successful, add the new elder to the local list and clear form fields
         const newElder = await response.json();
         setElderDataList((prevList) => [...prevList, newElder]);
 
-        // Clear form fields after submission
         setFormData({
           name: "",
           age: "",
@@ -138,7 +126,6 @@ function ElderForm() {
           createdBy: "",
         });
 
-        // Show success modal and auto-close after 2.5 seconds
         setShowSuccessModal(true);
         autoCloseModal(setShowSuccessModal);
       } else {
@@ -313,7 +300,7 @@ function ElderForm() {
             {loading ? (
               <div className="text-center">
                 <l-zoomies
-                  size="80"
+                  size="120"
                   stroke="5"
                   bg-opacity="0.1"
                   speed="1.4"
