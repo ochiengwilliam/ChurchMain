@@ -12,6 +12,7 @@ import {
   CModal,
   CModalHeader,
   CModalBody,
+  CModalFooter,
 } from "@coreui/react";
 import { useEffect, useState } from "react";
 import successSvg from "src/assets/images/avatars/13.svg";
@@ -29,7 +30,15 @@ const RegistrationForm = () => {
     spouseZpNo: "",
     nationalId: "",
     mobile: "",
+    gender: "",
+    baptized: "",
+    occupation: "",
+    parish: "",
+    address: "",
+    email: "",
   });
+
+  const [children, setChildren] = useState([]); // Store multiple child data
   const [districts, setDistricts] = useState([]);
   const [errors, setErrors] = useState({
     nationalId: "",
@@ -39,14 +48,19 @@ const RegistrationForm = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSpouseZpNoDisabled, setIsSpouseZpNoDisabled] = useState(true);
-  const [showMessage, setShowMessage] = useState(false);
+  const [showChildrenFields, setShowChildrenFields] = useState(false); // Show child form fields if female
 
+  // Fetch districts from API
   useEffect(() => {
     const fetchDistricts = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/districts");
         const data = await response.json();
-        setDistricts(data);
+        if (Array.isArray(data)) {
+          setDistricts(data);
+        } else if (data.districtList) {
+          setDistricts(data.districtList);
+        }
       } catch (error) {
         console.error("Error fetching districts:", error);
       }
@@ -72,7 +86,7 @@ const RegistrationForm = () => {
       } else if (value.length > 8) {
         setErrors((prev) => ({
           ...prev,
-          nationalId: "",
+          nationalId: "National ID must be 8 digits",
         }));
       }
       return;
@@ -85,11 +99,18 @@ const RegistrationForm = () => {
       } else if (value.length > 10) {
         setErrors((prev) => ({
           ...prev,
-          mobile: "",
+          mobile: "Mobile number must be 10 digits",
         }));
       }
       return;
     }
+
+    if (name === "gender" && value === "Female") {
+      setShowChildrenFields(true); // Show child form when "Female" is selected
+    } else if (name === "gender" && value !== "Female") {
+      setShowChildrenFields(false); // Hide child form for other genders
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -102,18 +123,40 @@ const RegistrationForm = () => {
     setIsSpouseZpNoDisabled(maritalStatus !== "Married");
   };
 
+  const handleChildDataChange = (e, index) => {
+    const { name, value } = e.target;
+    const newChildren = [...children];
+    newChildren[index] = { ...newChildren[index], [name]: value };
+    setChildren(newChildren);
+  };
+
+  const addChild = () => {
+    setChildren([
+      ...children,
+      {
+        childName: "",
+        childContact: "",
+        yearOfBirth: "",
+        baptized: "",
+        confirmed: "",
+        attendsChurchSchool: "",
+      },
+    ]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const apiUrl = "http://localhost:8080/api/registration";
 
     try {
+      // Submit the parent registration data first
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, children }),
       });
 
       if (!response.ok) {
@@ -123,6 +166,26 @@ const RegistrationForm = () => {
       const result = await response.json();
       console.log("Data successfully posted:", result);
 
+      // If children data is added, post it to the children API
+      if (children.length > 0) {
+        const childrenApiUrl = "http://localhost:8080/api/children";
+        const childResponse = await fetch(childrenApiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(children),
+        });
+
+        if (!childResponse.ok) {
+          throw new Error("Failed to submit child data");
+        }
+
+        const childResult = await childResponse.json();
+        console.log("Child data successfully posted:", childResult);
+      }
+
+      // Reset form and children data after successful submission
       setFormData({
         firstName: "",
         middleName: "",
@@ -134,13 +197,18 @@ const RegistrationForm = () => {
         spouseZpNo: "",
         nationalId: "",
         mobile: "",
+        gender: "",
+        baptized: "",
+        occupation: "",
+        parish: "",
+        address: "",
+        email: "",
       });
+      setChildren([]);
 
       setModalMessage("Registration was successful!");
       setIsError(false);
       setShowModal(true);
-
-      setShowMessage(true);
 
       setTimeout(() => {
         setShowModal(false);
@@ -152,8 +220,6 @@ const RegistrationForm = () => {
       setIsError(true);
       setShowModal(true);
 
-      setShowMessage(true);
-
       setTimeout(() => {
         setShowModal(false);
       }, 1500);
@@ -164,19 +230,15 @@ const RegistrationForm = () => {
     <>
       <CRow className="justify-content-md-center">
         <CCol xs={10}>
-          <CCard
-            className="mb-4"
-            style={{
-              boxShadow: "0px 15px 34px 0px rgba(0,0,0,0.2)",
-              color: "blue",
-              padding: "40px",
-            }}
-          >
-            <CCardHeader style={{ backgroundColor: "#fff" }}>
-              <h3>Registration Form</h3>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <h3 style={{ color: "blue", fontWeight: "bold" }}>
+                Registration Form
+              </h3>
             </CCardHeader>
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
+                {/* Form Fields for the User */}
                 <CRow className="mb-3">
                   <CCol md="6">
                     <CFormLabel
@@ -236,93 +298,12 @@ const RegistrationForm = () => {
                       Date of Birth
                     </CFormLabel>
                     <CFormInput
+                      type="date"
                       id="dob"
                       name="dob"
-                      type="date"
                       value={formData.dob}
                       onChange={handleChange}
                       required
-                    />
-                  </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
-                  <CCol md="6">
-                    <CFormLabel
-                      htmlFor="district"
-                      style={{ color: "blue", fontWeight: "bold" }}
-                    >
-                      District
-                    </CFormLabel>
-                    <CFormSelect
-                      id="district"
-                      name="district"
-                      value={formData.district}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select a district</option>
-                      {districts.map((district) => (
-                        <option key={district.id} value={district.districtName}>
-                          {district.districtName}
-                        </option>
-                      ))}
-                    </CFormSelect>
-                  </CCol>
-                  <CCol md="6">
-                    <CFormLabel
-                      htmlFor="zpNo"
-                      style={{ color: "blue", fontWeight: "bold" }}
-                    >
-                      ZP Number
-                    </CFormLabel>
-                    <CFormInput
-                      id="zpNo"
-                      name="zpNo"
-                      value={formData.zpNo}
-                      onChange={handleChange}
-                      placeholder="Enter ZP number"
-                      required
-                    />
-                  </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
-                  <CCol md="6">
-                    <CFormLabel
-                      htmlFor="maritalStatus"
-                      style={{ color: "blue", fontWeight: "bold" }}
-                    >
-                      Marital Status
-                    </CFormLabel>
-                    <CFormSelect
-                      id="maritalStatus"
-                      name="maritalStatus"
-                      value={formData.maritalStatus}
-                      onChange={handleMaritalStatusChange}
-                      required
-                    >
-                      <option value="">Select status</option>
-                      <option value="Single">Single</option>
-                      <option value="Married">Married</option>
-                      <option value="Divorced">Divorced</option>
-                      <option value="Widowed">Widowed</option>
-                    </CFormSelect>
-                  </CCol>
-                  <CCol md="6">
-                    <CFormLabel
-                      htmlFor="spouseZpNo"
-                      style={{ color: "blue", fontWeight: "bold" }}
-                    >
-                      Spouse ZP Number
-                    </CFormLabel>
-                    <CFormInput
-                      id="spouseZpNo"
-                      name="spouseZpNo"
-                      value={formData.spouseZpNo}
-                      onChange={handleChange}
-                      placeholder="Enter spouse ZP number"
-                      disabled={isSpouseZpNoDisabled}
                     />
                   </CCol>
                 </CRow>
@@ -341,9 +322,9 @@ const RegistrationForm = () => {
                       value={formData.nationalId}
                       onChange={handleChange}
                       placeholder="Enter national ID"
-                      maxLength="8"
                       required
                     />
+                    {errors.nationalId && <p>{errors.nationalId}</p>}
                   </CCol>
                   <CCol md="6">
                     <CFormLabel
@@ -358,14 +339,252 @@ const RegistrationForm = () => {
                       value={formData.mobile}
                       onChange={handleChange}
                       placeholder="Enter mobile number"
-                      maxLength="10"
                       required
                     />
+                    {errors.mobile && <p>{errors.mobile}</p>}
                   </CCol>
                 </CRow>
 
-                <CButton color="primary" type="submit">
-                  Register
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="zpNo"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      ZP Number
+                    </CFormLabel>
+                    <CFormInput
+                      id="zpNo"
+                      name="zpNo"
+                      value={formData.zpNo}
+                      onChange={handleChange}
+                      placeholder="Enter ZP number"
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="maritalStatus"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Marital Status
+                    </CFormLabel>
+                    <CFormSelect
+                      id="maritalStatus"
+                      name="maritalStatus"
+                      value={formData.maritalStatus}
+                      onChange={handleMaritalStatusChange}
+                    >
+                      <option value="">Select status</option>
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="spouseZpNo"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Spouse ZP Number
+                    </CFormLabel>
+                    <CFormInput
+                      id="spouseZpNo"
+                      name="spouseZpNo"
+                      value={formData.spouseZpNo}
+                      onChange={handleChange}
+                      placeholder="Enter spouse's ZP number"
+                      disabled={isSpouseZpNoDisabled}
+                    />
+                  </CCol>
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="gender"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      Gender
+                    </CFormLabel>
+                    <CFormSelect
+                      id="gender"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md="6">
+                    <CFormLabel
+                      htmlFor="district"
+                      style={{ color: "blue", fontWeight: "bold" }}
+                    >
+                      District
+                    </CFormLabel>
+                    <CFormSelect
+                      id="district"
+                      name="district"
+                      value={formData.district}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option
+                        value=""
+                        style={{ color: "blue", fontWeight: "bold" }}
+                      >
+                        Select district
+                      </option>
+                      {districts.map((district) => (
+                        <option key={district.id} value={district.districtName}>
+                          {district.districtName}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+
+                {/* Other form fields */}
+                {/* Child Information for Females */}
+                {showChildrenFields && (
+                  <div>
+                    <CButton color="info" onClick={addChild}>
+                      Add Child
+                    </CButton>
+
+                    {children.map((child, index) => (
+                      <CCard key={index} className="mt-3">
+                        <CCardBody>
+                          <CRow>
+                            <CCol md="6">
+                              <CFormLabel htmlFor={`childName${index}`}>
+                                Child's Name
+                              </CFormLabel>
+                              <CFormInput
+                                id={`childName${index}`}
+                                name="childName"
+                                value={child.childName}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                                placeholder="Enter child's name"
+                                required
+                              />
+                            </CCol>
+
+                            <CCol md="6">
+                              <CFormLabel htmlFor={`yearOfBirth${index}`}>
+                                Year of Birth
+                              </CFormLabel>
+                              <CFormInput
+                                type="date" // Use type="date" to allow date selection
+                                id={`yearOfBirth${index}`}
+                                name="yearOfBirth"
+                                value={child.yearOfBirth}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                                required
+                              />
+                            </CCol>
+                          </CRow>
+
+                          <CRow className="mb-3">
+                            <CCol md="6">
+                              <CFormLabel htmlFor={`childContact${index}`}>
+                                Child's Contact
+                              </CFormLabel>
+                              <CFormInput
+                                id={`childContact${index}`}
+                                name="childContact"
+                                value={child.childContact}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                                placeholder="Enter child's contact"
+                              />
+                            </CCol>
+
+                            <CCol md="6">
+                              <CFormLabel htmlFor={`baptized${index}`}>
+                                Baptized
+                              </CFormLabel>
+                              <CFormSelect
+                                id={`baptized${index}`}
+                                name="baptized"
+                                value={child.baptized}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                              >
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </CFormSelect>
+                            </CCol>
+                          </CRow>
+
+                          <CRow className="mb-3">
+                            <CCol md="6">
+                              <CFormLabel htmlFor={`confirmed${index}`}>
+                                Confirmed
+                              </CFormLabel>
+                              <CFormSelect
+                                id={`confirmed${index}`}
+                                name="confirmed"
+                                value={child.confirmed}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                              >
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </CFormSelect>
+                            </CCol>
+
+                            <CCol md="6">
+                              <CFormLabel
+                                htmlFor={`attendsChurchSchool${index}`}
+                              >
+                                Attends Church School
+                              </CFormLabel>
+                              <CFormSelect
+                                id={`attendsChurchSchool${index}`}
+                                name="attendsChurchSchool"
+                                value={child.attendsChurchSchool}
+                                onChange={(e) =>
+                                  handleChildDataChange(e, index)
+                                }
+                              >
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </CFormSelect>
+                            </CCol>
+                          </CRow>
+
+                          {/* Button to remove the child entry */}
+                          <CButton
+                            color="danger"
+                            onClick={() => removeChild(index)}
+                          >
+                            Remove Child
+                          </CButton>
+                        </CCardBody>
+                      </CCard>
+                    ))}
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <CButton type="submit" color="primary">
+                  Submit
                 </CButton>
               </CForm>
             </CCardBody>
@@ -373,21 +592,23 @@ const RegistrationForm = () => {
         </CCol>
       </CRow>
 
+      {/* Modal for Success/Error */}
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
-        <CModalHeader>
-          <h5>{isError ? "Error" : "Success"}</h5>
-        </CModalHeader>
-        <CModalBody style={{ textAlign: "center" }}>
+        <CModalHeader closeButton>{isError ? "Error" : "Success"}</CModalHeader>
+        <CModalBody>
           <img
             src={isError ? errorPng : successSvg}
-            alt={isError ? "Error icon" : "Success icon"}
-            style={{
-              width: "100px",
-              marginBottom: "20px",
-            }}
+            alt={isError ? "Error" : "Success"}
+            width={50}
+            height={50}
           />
-          {showMessage && <p>{modalMessage}</p>}
+          <p>{modalMessage}</p>
         </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </CButton>
+        </CModalFooter>
       </CModal>
     </>
   );
