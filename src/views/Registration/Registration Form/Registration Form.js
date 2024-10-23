@@ -48,7 +48,12 @@ const RegistrationForm = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSpouseZpNoDisabled, setIsSpouseZpNoDisabled] = useState(true);
-  const [showChildrenFields, setShowChildrenFields] = useState(false); // Show child form fields if female
+  const [showChildrenFields, setShowChildrenFields] = useState(false);
+  const removeChild = (index) => {
+    setChildren((prevChildren) => prevChildren.filter((_, i) => i !== index));
+  };
+
+  // Show child form fields if female
 
   // Fetch districts from API
   useEffect(() => {
@@ -156,7 +161,7 @@ const RegistrationForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, children }),
+        body: JSON.stringify({ ...formData, children }), // Include children array, which may be empty
       });
 
       if (!response.ok) {
@@ -166,7 +171,7 @@ const RegistrationForm = () => {
       const result = await response.json();
       console.log("Data successfully posted:", result);
 
-      // If children data is added, post it to the children API
+      // Only submit child data if there are children added
       if (children.length > 0) {
         const childrenApiUrl = "http://localhost:8080/api/children";
         const childResponse = await fetch(childrenApiUrl, {
@@ -453,7 +458,12 @@ const RegistrationForm = () => {
                 {/* Child Information for Females */}
                 {showChildrenFields && (
                   <div>
-                    <CButton color="info" onClick={addChild}>
+                    {/* Add Child Button */}
+                    <CButton
+                      className="mt-2"
+                      color="primary"
+                      onClick={addChild}
+                    >
                       Add Child
                     </CButton>
 
@@ -583,7 +593,7 @@ const RegistrationForm = () => {
                 )}
 
                 {/* Submit Button */}
-                <CButton type="submit" color="primary">
+                <CButton className="mt-4" type="submit" color="primary">
                   Submit
                 </CButton>
               </CForm>
